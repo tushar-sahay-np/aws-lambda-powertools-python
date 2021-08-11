@@ -722,6 +722,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#feature-flags-vs-parameters-vs-env-vars" class="md-nav__link">
+    Feature flags vs Parameters vs env vars
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -918,6 +925,13 @@
         <li class="md-nav__item">
   <a href="#testing-your-code" class="md-nav__link">
     Testing your code
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feature-flags-vs-parameters-vs-env-vars" class="md-nav__link">
+    Feature flags vs Parameters vs env vars
   </a>
   
 </li>
@@ -1964,6 +1978,37 @@
 </td></tr></table>
 </div>
 </div>
+<h2 id="feature-flags-vs-parameters-vs-env-vars">Feature flags vs Parameters vs env vars<a class="headerlink" href="#feature-flags-vs-parameters-vs-env-vars" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>When to use</th>
+<th>Requires new deployment on changes</th>
+<th>Supported services</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html" target="_blank">Environment variables</a></strong></td>
+<td>Simple configuration that will rarely if ever change, because changing it requires a Lambda function deployment.</td>
+<td>Yes</td>
+<td>Lambda</td>
+</tr>
+<tr>
+<td><strong><a href="../parameters/">Parameters utility</a></strong></td>
+<td>Access to secrets, or fetch parameters in different formats from AWS System Manager Parameter Store or Amazon DynamoDB.</td>
+<td>No</td>
+<td>Parameter Store, DynamoDB, Secrets Manager, AppConfig</td>
+</tr>
+<tr>
+<td><strong>Feature flags utility</strong></td>
+<td>Rule engine to define when one or multiple features should be enabled depending on the input.</td>
+<td>No</td>
+<td>AppConfig</td>
+</tr>
+</tbody>
+</table>
                 
                   
                     
@@ -1972,7 +2017,7 @@
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-08-10
+      Last update: 2021-08-11
     
   </small>
 </div>
