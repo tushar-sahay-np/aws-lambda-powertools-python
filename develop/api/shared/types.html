@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>aws_lambda_powertools.shared.constants API documentation</title>
+<title>aws_lambda_powertools.shared.types API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,36 +19,16 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>aws_lambda_powertools.shared.constants</code></h1>
+<h1 class="title">Module <code>aws_lambda_powertools.shared.types</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">TRACER_CAPTURE_RESPONSE_ENV: str = &#34;POWERTOOLS_TRACER_CAPTURE_RESPONSE&#34;
-TRACER_CAPTURE_ERROR_ENV: str = &#34;POWERTOOLS_TRACER_CAPTURE_ERROR&#34;
-TRACER_DISABLED_ENV: str = &#34;POWERTOOLS_TRACE_DISABLED&#34;
+<pre><code class="python">from typing import Any, Callable, TypeVar
 
-LOGGER_LOG_SAMPLING_RATE: str = &#34;POWERTOOLS_LOGGER_SAMPLE_RATE&#34;
-LOGGER_LOG_EVENT_ENV: str = &#34;POWERTOOLS_LOGGER_LOG_EVENT&#34;
-LOGGER_LOG_DEDUPLICATION_ENV: str = &#34;POWERTOOLS_LOG_DEDUPLICATION_DISABLED&#34;
-
-MIDDLEWARE_FACTORY_TRACE_ENV: str = &#34;POWERTOOLS_TRACE_MIDDLEWARES&#34;
-
-METRICS_NAMESPACE_ENV: str = &#34;POWERTOOLS_METRICS_NAMESPACE&#34;
-
-EVENT_HANDLER_DEBUG_ENV: str = &#34;POWERTOOLS_EVENT_HANDLER_DEBUG&#34;
-
-SERVICE_NAME_ENV: str = &#34;POWERTOOLS_SERVICE_NAME&#34;
-XRAY_TRACE_ID_ENV: str = &#34;_X_AMZN_TRACE_ID&#34;
-LAMBDA_TASK_ROOT_ENV: str = &#34;LAMBDA_TASK_ROOT&#34;
-
-
-LAMBDA_FUNCTION_NAME_ENV: str = &#34;AWS_LAMBDA_FUNCTION_NAME&#34;
-
-XRAY_SDK_MODULE: str = &#34;aws_xray_sdk&#34;
-XRAY_SDK_CORE_MODULE: str = &#34;aws_xray_sdk.core&#34;</code></pre>
+AnyCallableT = TypeVar(&#34;AnyCallableT&#34;, bound=Callable[..., Any])  # noqa: VNE001</code></pre>
 </details>
 </section>
 <section>

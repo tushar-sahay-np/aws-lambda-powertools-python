@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import re
+<pre><code class="python">import enum
+import re
 from typing import Any, Dict, List, Optional
 
 from aws_lambda_powertools.utilities.data_classes.common import (
@@ -340,7 +341,7 @@ class APIGatewayAuthorizerResponseV2:
         return response
 
 
-class HttpVerb:
+class HttpVerb(enum.Enum):
     GET = &#34;GET&#34;
     POST = &#34;POST&#34;
     PUT = &#34;PUT&#34;
@@ -414,8 +415,9 @@ class APIGatewayAuthorizerResponse:
         &#34;&#34;&#34;Adds a route to the internal lists of allowed or denied routes. Each object in
         the internal list contains a resource ARN and a condition statement. The condition
         statement can be null.&#34;&#34;&#34;
-        if verb != &#34;*&#34; and not hasattr(HttpVerb, verb):
-            raise ValueError(f&#34;Invalid HTTP verb {verb}. Allowed verbs in HttpVerb class&#34;)
+        if verb != &#34;*&#34; and verb not in HttpVerb.__members__:
+            allowed_values = [verb.value for verb in HttpVerb]
+            raise ValueError(f&#34;Invalid HTTP verb: &#39;{verb}&#39;. Use either &#39;{allowed_values}&#39;&#34;)
 
         resource_pattern = re.compile(self.path_regex)
         if not resource_pattern.match(resource):
@@ -461,13 +463,24 @@ class APIGatewayAuthorizerResponse:
 
         return statements
 
-    def allow_all_routes(self):
-        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to authorize access to all methods of an API&#34;&#34;&#34;
-        self._add_route(&#34;Allow&#34;, HttpVerb.ALL, &#34;*&#34;, [])
+    def allow_all_routes(self, http_method: str = HttpVerb.ALL.value):
+        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to authorize access to all methods of an API
 
-    def deny_all_routes(self):
-        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to deny access to all methods of an API&#34;&#34;&#34;
-        self._add_route(&#34;Deny&#34;, HttpVerb.ALL, &#34;*&#34;, [])
+        Parameters
+        ----------
+        http_method: str
+        &#34;&#34;&#34;
+        self._add_route(effect=&#34;Allow&#34;, verb=http_method, resource=&#34;*&#34;, conditions=[])
+
+    def deny_all_routes(self, http_method: str = HttpVerb.ALL.value):
+        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to deny access to all methods of an API
+
+        Parameters
+        ----------
+        http_method: str
+        &#34;&#34;&#34;
+
+        self._add_route(effect=&#34;Deny&#34;, verb=http_method, resource=&#34;*&#34;, conditions=[])
 
     def allow_route(self, http_method: str, resource: str, conditions: Optional[List[Dict]] = None):
         &#34;&#34;&#34;Adds an API Gateway method (Http verb + Resource path) to the list of allowed
@@ -475,7 +488,8 @@ class APIGatewayAuthorizerResponse:
 
         Optionally includes a condition for the policy statement. More on AWS policy
         conditions here: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html#Condition&#34;&#34;&#34;
-        self._add_route(&#34;Allow&#34;, http_method, resource, conditions or [])
+        conditions = conditions or []
+        self._add_route(effect=&#34;Allow&#34;, verb=http_method, resource=resource, conditions=conditions)
 
     def deny_route(self, http_method: str, resource: str, conditions: Optional[List[Dict]] = None):
         &#34;&#34;&#34;Adds an API Gateway method (Http verb + Resource path) to the list of denied
@@ -483,7 +497,8 @@ class APIGatewayAuthorizerResponse:
 
         Optionally includes a condition for the policy statement. More on AWS policy
         conditions here: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html#Condition&#34;&#34;&#34;
-        self._add_route(&#34;Deny&#34;, http_method, resource, conditions or [])
+        conditions = conditions or []
+        self._add_route(effect=&#34;Deny&#34;, verb=http_method, resource=resource, conditions=conditions)
 
     def asdict(self) -&gt; Dict[str, Any]:
         &#34;&#34;&#34;Generates the policy document based on the internal lists of allowed and denied
@@ -1358,8 +1373,9 @@ Note: only names of type string and values of type int, string or boolean are su
         &#34;&#34;&#34;Adds a route to the internal lists of allowed or denied routes. Each object in
         the internal list contains a resource ARN and a condition statement. The condition
         statement can be null.&#34;&#34;&#34;
-        if verb != &#34;*&#34; and not hasattr(HttpVerb, verb):
-            raise ValueError(f&#34;Invalid HTTP verb {verb}. Allowed verbs in HttpVerb class&#34;)
+        if verb != &#34;*&#34; and verb not in HttpVerb.__members__:
+            allowed_values = [verb.value for verb in HttpVerb]
+            raise ValueError(f&#34;Invalid HTTP verb: &#39;{verb}&#39;. Use either &#39;{allowed_values}&#39;&#34;)
 
         resource_pattern = re.compile(self.path_regex)
         if not resource_pattern.match(resource):
@@ -1405,13 +1421,24 @@ Note: only names of type string and values of type int, string or boolean are su
 
         return statements
 
-    def allow_all_routes(self):
-        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to authorize access to all methods of an API&#34;&#34;&#34;
-        self._add_route(&#34;Allow&#34;, HttpVerb.ALL, &#34;*&#34;, [])
+    def allow_all_routes(self, http_method: str = HttpVerb.ALL.value):
+        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to authorize access to all methods of an API
 
-    def deny_all_routes(self):
-        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to deny access to all methods of an API&#34;&#34;&#34;
-        self._add_route(&#34;Deny&#34;, HttpVerb.ALL, &#34;*&#34;, [])
+        Parameters
+        ----------
+        http_method: str
+        &#34;&#34;&#34;
+        self._add_route(effect=&#34;Allow&#34;, verb=http_method, resource=&#34;*&#34;, conditions=[])
+
+    def deny_all_routes(self, http_method: str = HttpVerb.ALL.value):
+        &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to deny access to all methods of an API
+
+        Parameters
+        ----------
+        http_method: str
+        &#34;&#34;&#34;
+
+        self._add_route(effect=&#34;Deny&#34;, verb=http_method, resource=&#34;*&#34;, conditions=[])
 
     def allow_route(self, http_method: str, resource: str, conditions: Optional[List[Dict]] = None):
         &#34;&#34;&#34;Adds an API Gateway method (Http verb + Resource path) to the list of allowed
@@ -1419,7 +1446,8 @@ Note: only names of type string and values of type int, string or boolean are su
 
         Optionally includes a condition for the policy statement. More on AWS policy
         conditions here: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html#Condition&#34;&#34;&#34;
-        self._add_route(&#34;Allow&#34;, http_method, resource, conditions or [])
+        conditions = conditions or []
+        self._add_route(effect=&#34;Allow&#34;, verb=http_method, resource=resource, conditions=conditions)
 
     def deny_route(self, http_method: str, resource: str, conditions: Optional[List[Dict]] = None):
         &#34;&#34;&#34;Adds an API Gateway method (Http verb + Resource path) to the list of denied
@@ -1427,7 +1455,8 @@ Note: only names of type string and values of type int, string or boolean are su
 
         Optionally includes a condition for the policy statement. More on AWS policy
         conditions here: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html#Condition&#34;&#34;&#34;
-        self._add_route(&#34;Deny&#34;, http_method, resource, conditions or [])
+        conditions = conditions or []
+        self._add_route(effect=&#34;Deny&#34;, verb=http_method, resource=resource, conditions=conditions)
 
     def asdict(self) -&gt; Dict[str, Any]:
         &#34;&#34;&#34;Generates the policy document based on the internal lists of allowed and denied
@@ -1464,17 +1493,27 @@ Note: only names of type string and values of type int, string or boolean are su
 <h3>Methods</h3>
 <dl>
 <dt id="aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event.APIGatewayAuthorizerResponse.allow_all_routes"><code class="name flex">
-<span>def <span class="ident">allow_all_routes</span></span>(<span>self)</span>
+<span>def <span class="ident">allow_all_routes</span></span>(<span>self, http_method: str = '*')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Adds a '*' allow to the policy to authorize access to all methods of an API</p></div>
+<div class="desc"><p>Adds a '*' allow to the policy to authorize access to all methods of an API</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>http_method</code></strong> :&ensp;<code>str</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def allow_all_routes(self):
-    &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to authorize access to all methods of an API&#34;&#34;&#34;
-    self._add_route(&#34;Allow&#34;, HttpVerb.ALL, &#34;*&#34;, [])</code></pre>
+<pre><code class="python">def allow_all_routes(self, http_method: str = HttpVerb.ALL.value):
+    &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to authorize access to all methods of an API
+
+    Parameters
+    ----------
+    http_method: str
+    &#34;&#34;&#34;
+    self._add_route(effect=&#34;Allow&#34;, verb=http_method, resource=&#34;*&#34;, conditions=[])</code></pre>
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event.APIGatewayAuthorizerResponse.allow_route"><code class="name flex">
@@ -1495,7 +1534,8 @@ conditions here: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/refer
 
     Optionally includes a condition for the policy statement. More on AWS policy
     conditions here: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html#Condition&#34;&#34;&#34;
-    self._add_route(&#34;Allow&#34;, http_method, resource, conditions or [])</code></pre>
+    conditions = conditions or []
+    self._add_route(effect=&#34;Allow&#34;, verb=http_method, resource=resource, conditions=conditions)</code></pre>
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event.APIGatewayAuthorizerResponse.asdict"><code class="name flex">
@@ -1533,17 +1573,28 @@ Methods that includes conditions will have their own statement in the policy.</p
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event.APIGatewayAuthorizerResponse.deny_all_routes"><code class="name flex">
-<span>def <span class="ident">deny_all_routes</span></span>(<span>self)</span>
+<span>def <span class="ident">deny_all_routes</span></span>(<span>self, http_method: str = '*')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Adds a '*' allow to the policy to deny access to all methods of an API</p></div>
+<div class="desc"><p>Adds a '*' allow to the policy to deny access to all methods of an API</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>http_method</code></strong> :&ensp;<code>str</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def deny_all_routes(self):
-    &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to deny access to all methods of an API&#34;&#34;&#34;
-    self._add_route(&#34;Deny&#34;, HttpVerb.ALL, &#34;*&#34;, [])</code></pre>
+<pre><code class="python">def deny_all_routes(self, http_method: str = HttpVerb.ALL.value):
+    &#34;&#34;&#34;Adds a &#39;*&#39; allow to the policy to deny access to all methods of an API
+
+    Parameters
+    ----------
+    http_method: str
+    &#34;&#34;&#34;
+
+    self._add_route(effect=&#34;Deny&#34;, verb=http_method, resource=&#34;*&#34;, conditions=[])</code></pre>
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event.APIGatewayAuthorizerResponse.deny_route"><code class="name flex">
@@ -1564,7 +1615,8 @@ conditions here: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/refer
 
     Optionally includes a condition for the policy statement. More on AWS policy
     conditions here: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html#Condition&#34;&#34;&#34;
-    self._add_route(&#34;Deny&#34;, http_method, resource, conditions or [])</code></pre>
+    conditions = conditions or []
+    self._add_route(effect=&#34;Deny&#34;, verb=http_method, resource=resource, conditions=conditions)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1823,14 +1875,15 @@ def arn(self) -&gt; str:
 </dd>
 <dt id="aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event.HttpVerb"><code class="flex name class">
 <span>class <span class="ident">HttpVerb</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>An enumeration.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class HttpVerb:
+<pre><code class="python">class HttpVerb(enum.Enum):
     GET = &#34;GET&#34;
     POST = &#34;POST&#34;
     PUT = &#34;PUT&#34;
@@ -1840,6 +1893,10 @@ def arn(self) -&gt; str:
     OPTIONS = &#34;OPTIONS&#34;
     ALL = &#34;*&#34;</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event.HttpVerb.ALL"><code class="name">var <span class="ident">ALL</span></code></dt>

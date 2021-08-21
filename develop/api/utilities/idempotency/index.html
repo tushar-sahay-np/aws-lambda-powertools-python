@@ -34,14 +34,18 @@ Utility for adding idempotency to lambda functions
 from aws_lambda_powertools.utilities.idempotency.persistence.base import BasePersistenceLayer
 from aws_lambda_powertools.utilities.idempotency.persistence.dynamodb import DynamoDBPersistenceLayer
 
-from .idempotency import IdempotencyConfig, idempotent
+from .idempotency import IdempotencyConfig, idempotent, idempotent_function
 
-__all__ = (&#34;DynamoDBPersistenceLayer&#34;, &#34;BasePersistenceLayer&#34;, &#34;idempotent&#34;, &#34;IdempotencyConfig&#34;)</code></pre>
+__all__ = (&#34;DynamoDBPersistenceLayer&#34;, &#34;BasePersistenceLayer&#34;, &#34;idempotent&#34;, &#34;idempotent_function&#34;, &#34;IdempotencyConfig&#34;)</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
+<dt><code class="name"><a title="aws_lambda_powertools.utilities.idempotency.base" href="base.html">aws_lambda_powertools.utilities.idempotency.base</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="aws_lambda_powertools.utilities.idempotency.config" href="config.html">aws_lambda_powertools.utilities.idempotency.config</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -66,10 +70,10 @@ __all__ = (&#34;DynamoDBPersistenceLayer&#34;, &#34;BasePersistenceLayer&#34;, &
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="aws_lambda_powertools.utilities.idempotency.idempotent"><code class="name flex">
-<span>def <span class="ident">idempotent</span></span>(<span>handler: Callable[[Any, aws_lambda_powertools.utilities.lambda_context.LambdaContext], Any], event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>, persistence_store: <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer">BasePersistenceLayer</a>, config: Optional[<a title="aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig" href="config.html#aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig">IdempotencyConfig</a>] = None) ‑> Any</span>
+<span>def <span class="ident">idempotent</span></span>(<span>handler: Callable[[Any, aws_lambda_powertools.utilities.lambda_context.LambdaContext], Any], event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>, persistence_store: <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer">BasePersistenceLayer</a>, config: Optional[<a title="aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig" href="config.html#aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig">IdempotencyConfig</a>] = None, **kwargs) ‑> Any</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Middleware to handle idempotency</p>
+<div class="desc"><p>Decorator to handle idempotency</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>handler</code></strong> :&ensp;<code>Callable</code></dt>
@@ -107,9 +111,10 @@ def idempotent(
     context: LambdaContext,
     persistence_store: BasePersistenceLayer,
     config: Optional[IdempotencyConfig] = None,
+    **kwargs,
 ) -&gt; Any:
     &#34;&#34;&#34;
-    Middleware to handle idempotency
+    Decorator to handle idempotency
 
     Parameters
     ----------
@@ -141,21 +146,124 @@ def idempotent(
     &#34;&#34;&#34;
 
     config = config or IdempotencyConfig()
+    args = event, context
     idempotency_handler = IdempotencyHandler(
-        lambda_handler=handler, event=event, context=context, persistence_store=persistence_store, config=config
+        function=handler,
+        function_payload=event,
+        config=config,
+        persistence_store=persistence_store,
+        function_args=args,
+        function_kwargs=kwargs,
     )
 
-    # IdempotencyInconsistentStateError can happen under rare but expected cases when persistent state changes in the
-    # small time between put &amp; get requests. In most cases we can retry successfully on this exception.
-    # Maintenance: Allow customers to specify number of retries
-    max_handler_retries = 2
-    for i in range(max_handler_retries + 1):
-        try:
-            return idempotency_handler.handle()
-        except IdempotencyInconsistentStateError:
-            if i == max_handler_retries:
-                # Allow the exception to bubble up after max retries exceeded
-                raise</code></pre>
+    return idempotency_handler.handle()</code></pre>
+</details>
+</dd>
+<dt id="aws_lambda_powertools.utilities.idempotency.idempotent_function"><code class="name flex">
+<span>def <span class="ident">idempotent_function</span></span>(<span>function: Optional[~AnyCallableT] = None, *, data_keyword_argument: str, persistence_store: <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer">BasePersistenceLayer</a>, config: Optional[<a title="aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig" href="config.html#aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig">IdempotencyConfig</a>] = None) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decorator to handle idempotency of any function</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>function</code></strong> :&ensp;<code>Callable</code></dt>
+<dd>Function to be decorated</dd>
+<dt><strong><code>data_keyword_argument</code></strong> :&ensp;<code>str</code></dt>
+<dd>Keyword parameter name in function's signature that we should hash as idempotency key, e.g. "order"</dd>
+<dt><strong><code>persistence_store</code></strong> :&ensp;<code><a title="aws_lambda_powertools.utilities.idempotency.BasePersistenceLayer" href="#aws_lambda_powertools.utilities.idempotency.BasePersistenceLayer">BasePersistenceLayer</a></code></dt>
+<dd>Instance of BasePersistenceLayer to store data</dd>
+<dt><strong><code>config</code></strong> :&ensp;<code><a title="aws_lambda_powertools.utilities.idempotency.IdempotencyConfig" href="#aws_lambda_powertools.utilities.idempotency.IdempotencyConfig">IdempotencyConfig</a></code></dt>
+<dd>Configuration</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p><strong>Processes an order in an idempotent manner</strong></p>
+<pre><code>from aws_lambda_powertools.utilities.idempotency import (
+   idempotent_function, DynamoDBPersistenceLayer, IdempotencyConfig
+)
+
+idem_config=IdempotencyConfig(event_key_jmespath="order_id")
+persistence_layer = DynamoDBPersistenceLayer(table_name="idempotency_store")
+
+@idempotent_function(data_keyword_argument="order", config=idem_config, persistence_store=persistence_layer)
+def process_order(customer_id: str, order: dict, **kwargs):
+    return {"StatusCode": 200}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def idempotent_function(
+    function: Optional[AnyCallableT] = None,
+    *,
+    data_keyword_argument: str,
+    persistence_store: BasePersistenceLayer,
+    config: Optional[IdempotencyConfig] = None,
+) -&gt; Any:
+    &#34;&#34;&#34;
+    Decorator to handle idempotency of any function
+
+    Parameters
+    ----------
+    function: Callable
+        Function to be decorated
+    data_keyword_argument: str
+        Keyword parameter name in function&#39;s signature that we should hash as idempotency key, e.g. &#34;order&#34;
+    persistence_store: BasePersistenceLayer
+        Instance of BasePersistenceLayer to store data
+    config: IdempotencyConfig
+        Configuration
+
+    Examples
+    --------
+    **Processes an order in an idempotent manner**
+
+        from aws_lambda_powertools.utilities.idempotency import (
+           idempotent_function, DynamoDBPersistenceLayer, IdempotencyConfig
+        )
+
+        idem_config=IdempotencyConfig(event_key_jmespath=&#34;order_id&#34;)
+        persistence_layer = DynamoDBPersistenceLayer(table_name=&#34;idempotency_store&#34;)
+
+        @idempotent_function(data_keyword_argument=&#34;order&#34;, config=idem_config, persistence_store=persistence_layer)
+        def process_order(customer_id: str, order: dict, **kwargs):
+            return {&#34;StatusCode&#34;: 200}
+    &#34;&#34;&#34;
+
+    if function is None:
+        return cast(
+            AnyCallableT,
+            functools.partial(
+                idempotent_function,
+                data_keyword_argument=data_keyword_argument,
+                persistence_store=persistence_store,
+                config=config,
+            ),
+        )
+
+    config = config or IdempotencyConfig()
+
+    @functools.wraps(function)
+    def decorate(*args, **kwargs):
+        payload = kwargs.get(data_keyword_argument)
+
+        if payload is None:
+            raise RuntimeError(
+                f&#34;Unable to extract &#39;{data_keyword_argument}&#39; from keyword arguments.&#34;
+                f&#34; Ensure this exists in your function&#39;s signature as well as the caller used it as a keyword argument&#34;
+            )
+
+        idempotency_handler = IdempotencyHandler(
+            function=function,
+            function_payload=payload,
+            config=config,
+            persistence_store=persistence_store,
+            function_args=args,
+            function_kwargs=kwargs,
+        )
+
+        return idempotency_handler.handle()
+
+    return cast(AnyCallableT, decorate)</code></pre>
 </details>
 </dd>
 </dl>
@@ -222,16 +330,14 @@ def idempotent(
             self._cache = LRUDict(max_items=config.local_cache_max_items)
         self.hash_function = getattr(hashlib, config.hash_function)
 
-    def _get_hashed_idempotency_key(self, event: Dict[str, Any], context: LambdaContext) -&gt; str:
+    def _get_hashed_idempotency_key(self, data: Dict[str, Any]) -&gt; str:
         &#34;&#34;&#34;
-        Extract data from lambda event using event key jmespath, and return a hashed representation
+        Extract idempotency key and return a hashed representation
 
         Parameters
         ----------
-        event: Dict[str, Any]
-            Lambda event
-        context: LambdaContext
-            Lambda context
+        data: Dict[str, Any]
+            Incoming data
 
         Returns
         -------
@@ -239,18 +345,17 @@ def idempotent(
             Hashed representation of the data extracted by the jmespath expression
 
         &#34;&#34;&#34;
-        data = event
-
         if self.event_key_jmespath:
-            data = self.event_key_compiled_jmespath.search(event, options=jmespath.Options(**self.jmespath_options))
+            data = self.event_key_compiled_jmespath.search(data, options=jmespath.Options(**self.jmespath_options))
 
-        if self.is_missing_idempotency_key(data):
+        if self.is_missing_idempotency_key(data=data):
             if self.raise_on_no_idempotency_key:
                 raise IdempotencyKeyError(&#34;No data found to create a hashed idempotency_key&#34;)
             warnings.warn(f&#34;No value found for idempotency_key. jmespath: {self.event_key_jmespath}&#34;)
 
-        generated_hash = self._generate_hash(data)
-        return f&#34;{context.function_name}#{generated_hash}&#34;
+        generated_hash = self._generate_hash(data=data)
+        function_name = os.getenv(constants.LAMBDA_FUNCTION_NAME_ENV, &#34;test-func&#34;)
+        return f&#34;{function_name}#{generated_hash}&#34;
 
     @staticmethod
     def is_missing_idempotency_key(data) -&gt; bool:
@@ -258,14 +363,14 @@ def idempotent(
             return all(x is None for x in data)
         return not data
 
-    def _get_hashed_payload(self, lambda_event: Dict[str, Any]) -&gt; str:
+    def _get_hashed_payload(self, data: Dict[str, Any]) -&gt; str:
         &#34;&#34;&#34;
-        Extract data from lambda event using validation key jmespath, and return a hashed representation
+        Extract payload using validation key jmespath and return a hashed representation
 
         Parameters
         ----------
-        lambda_event: Dict[str, Any]
-            Lambda event
+        data: Dict[str, Any]
+            Payload
 
         Returns
         -------
@@ -275,8 +380,8 @@ def idempotent(
         &#34;&#34;&#34;
         if not self.payload_validation_enabled:
             return &#34;&#34;
-        data = self.validation_key_jmespath.search(lambda_event)
-        return self._generate_hash(data)
+        data = self.validation_key_jmespath.search(data)
+        return self._generate_hash(data=data)
 
     def _generate_hash(self, data: Any) -&gt; str:
         &#34;&#34;&#34;
@@ -297,26 +402,26 @@ def idempotent(
         hashed_data = self.hash_function(json.dumps(data, cls=Encoder).encode())
         return hashed_data.hexdigest()
 
-    def _validate_payload(self, lambda_event: Dict[str, Any], data_record: DataRecord) -&gt; None:
+    def _validate_payload(self, data: Dict[str, Any], data_record: DataRecord) -&gt; None:
         &#34;&#34;&#34;
-        Validate that the hashed payload matches in the lambda event and stored data record
+        Validate that the hashed payload matches data provided and stored data record
 
         Parameters
         ----------
-        lambda_event: Dict[str, Any]
-            Lambda event
+        data: Dict[str, Any]
+            Payload
         data_record: DataRecord
             DataRecord instance
 
         Raises
         ----------
         IdempotencyValidationError
-            Event payload doesn&#39;t match the stored record for the given idempotency key
+            Payload doesn&#39;t match the stored record for the given idempotency key
 
         &#34;&#34;&#34;
         if self.payload_validation_enabled:
-            lambda_payload_hash = self._get_hashed_payload(lambda_event)
-            if data_record.payload_hash != lambda_payload_hash:
+            data_hash = self._get_hashed_payload(data=data)
+            if data_record.payload_hash != data_hash:
                 raise IdempotencyValidationError(&#34;Payload does not match stored record for this event key&#34;)
 
     def _get_expiry_timestamp(self) -&gt; int:
@@ -357,12 +462,12 @@ def idempotent(
     def _retrieve_from_cache(self, idempotency_key: str):
         if not self.use_local_cache:
             return
-        cached_record = self._cache.get(idempotency_key)
+        cached_record = self._cache.get(key=idempotency_key)
         if cached_record:
             if not cached_record.is_expired:
                 return cached_record
             logger.debug(f&#34;Removing expired local cache record for idempotency key: {idempotency_key}&#34;)
-            self._delete_from_cache(idempotency_key)
+            self._delete_from_cache(idempotency_key=idempotency_key)
 
     def _delete_from_cache(self, idempotency_key: str):
         if not self.use_local_cache:
@@ -370,52 +475,48 @@ def idempotent(
         if idempotency_key in self._cache:
             del self._cache[idempotency_key]
 
-    def save_success(self, event: Dict[str, Any], context: LambdaContext, result: dict) -&gt; None:
+    def save_success(self, data: Dict[str, Any], result: dict) -&gt; None:
         &#34;&#34;&#34;
         Save record of function&#39;s execution completing successfully
 
         Parameters
         ----------
-        event: Dict[str, Any]
-            Lambda event
-        context: LambdaContext
-            Lambda context
+        data: Dict[str, Any]
+            Payload
         result: dict
-            The response from lambda handler
+            The response from function
         &#34;&#34;&#34;
         response_data = json.dumps(result, cls=Encoder)
 
         data_record = DataRecord(
-            idempotency_key=self._get_hashed_idempotency_key(event, context),
+            idempotency_key=self._get_hashed_idempotency_key(data=data),
             status=STATUS_CONSTANTS[&#34;COMPLETED&#34;],
             expiry_timestamp=self._get_expiry_timestamp(),
             response_data=response_data,
-            payload_hash=self._get_hashed_payload(event),
+            payload_hash=self._get_hashed_payload(data=data),
         )
         logger.debug(
-            f&#34;Lambda successfully executed. Saving record to persistence store with &#34;
+            f&#34;Function successfully executed. Saving record to persistence store with &#34;
             f&#34;idempotency key: {data_record.idempotency_key}&#34;
         )
         self._update_record(data_record=data_record)
 
-        self._save_to_cache(data_record)
+        self._save_to_cache(data_record=data_record)
 
-    def save_inprogress(self, event: Dict[str, Any], context: LambdaContext) -&gt; None:
+    def save_inprogress(self, data: Dict[str, Any]) -&gt; None:
         &#34;&#34;&#34;
         Save record of function&#39;s execution being in progress
 
         Parameters
         ----------
-        event: Dict[str, Any]
-            Lambda event
-        context: LambdaContext
-            Lambda context
+        data: Dict[str, Any]
+            Payload
         &#34;&#34;&#34;
         data_record = DataRecord(
-            idempotency_key=self._get_hashed_idempotency_key(event, context),
+            idempotency_key=self._get_hashed_idempotency_key(data=data),
             status=STATUS_CONSTANTS[&#34;INPROGRESS&#34;],
             expiry_timestamp=self._get_expiry_timestamp(),
-            payload_hash=self._get_hashed_payload(event),
+            payload_hash=self._get_hashed_payload(data=data),
         )
 
         logger.debug(f&#34;Saving in progress record for idempotency key: {data_record.idempotency_key}&#34;)
@@ -423,42 +524,37 @@ def idempotent(
         if self._retrieve_from_cache(idempotency_key=data_record.idempotency_key):
             raise IdempotencyItemAlreadyExistsError
 
-        self._put_record(data_record)
+        self._put_record(data_record=data_record)
 
-    def delete_record(self, event: Dict[str, Any], context: LambdaContext, exception: Exception):
+    def delete_record(self, data: Dict[str, Any], exception: Exception):
         &#34;&#34;&#34;
         Delete record from the persistence store
 
         Parameters
         ----------
-        event: Dict[str, Any]
-            Lambda event
-        context: LambdaContext
-            Lambda context
+        data: Dict[str, Any]
+            Payload
         exception
-            The exception raised by the lambda handler
+            The exception raised by the function
         &#34;&#34;&#34;
-        data_record = DataRecord(idempotency_key=self._get_hashed_idempotency_key(event, context))
+        data_record = DataRecord(idempotency_key=self._get_hashed_idempotency_key(data=data))
 
         logger.debug(
-            f&#34;Lambda raised an exception ({type(exception).__name__}). Clearing in progress record in persistence &#34;
+            f&#34;Function raised an exception ({type(exception).__name__}). Clearing in progress record in persistence &#34;
             f&#34;store for idempotency key: {data_record.idempotency_key}&#34;
         )
-        self._delete_record(data_record)
+        self._delete_record(data_record=data_record)
 
-        self._delete_from_cache(data_record.idempotency_key)
+        self._delete_from_cache(idempotency_key=data_record.idempotency_key)
 
-    def get_record(self, event: Dict[str, Any], context: LambdaContext) -&gt; DataRecord:
+    def get_record(self, data: Dict[str, Any]) -&gt; DataRecord:
         &#34;&#34;&#34;
-        Calculate idempotency key for lambda_event, then retrieve item from persistence store using idempotency key
-        and return it as a DataRecord instance.and return it as a DataRecord instance.
+        Retrieve idempotency key for data provided, fetch from persistence store, and convert to DataRecord.
 
         Parameters
         ----------
-        event: Dict[str, Any]
-            Lambda event
-        context: LambdaContext
-            Lambda context
+        data: Dict[str, Any]
+            Payload
 
         Returns
         -------
@@ -470,22 +566,22 @@ def idempotent(
         IdempotencyItemNotFoundError
             Exception raised if no record exists in persistence store with the idempotency key
         IdempotencyValidationError
-            Event payload doesn&#39;t match the stored record for the given idempotency key
+            Payload doesn&#39;t match the stored record for the given idempotency key
         &#34;&#34;&#34;
 
-        idempotency_key = self._get_hashed_idempotency_key(event, context)
+        idempotency_key = self._get_hashed_idempotency_key(data=data)
 
         cached_record = self._retrieve_from_cache(idempotency_key=idempotency_key)
         if cached_record:
             logger.debug(f&#34;Idempotency record found in cache with idempotency key: {idempotency_key}&#34;)
-            self._validate_payload(event, cached_record)
+            self._validate_payload(data=data, data_record=cached_record)
             return cached_record
 
-        record = self._get_record(idempotency_key)
+        record = self._get_record(idempotency_key=idempotency_key)
 
         self._save_to_cache(data_record=record)
 
-        self._validate_payload(event, record)
+        self._validate_payload(data=data, data_record=record)
         return record
 
     @abstractmethod
@@ -623,59 +719,52 @@ def is_missing_idempotency_key(data) -&gt; bool:
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.idempotency.BasePersistenceLayer.delete_record"><code class="name flex">
-<span>def <span class="ident">delete_record</span></span>(<span>self, event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>, exception: Exception)</span>
+<span>def <span class="ident">delete_record</span></span>(<span>self, data: Dict[str, Any], exception: Exception)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Delete record from the persistence store</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>event</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
-<dd>Lambda event</dd>
-<dt><strong><code>context</code></strong> :&ensp;<code>LambdaContext</code></dt>
-<dd>Lambda context</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
+<dd>Payload</dd>
 <dt><strong><code>exception</code></strong></dt>
-<dd>The exception raised by the lambda handler</dd>
+<dd>The exception raised by the function</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def delete_record(self, event: Dict[str, Any], context: LambdaContext, exception: Exception):
+<pre><code class="python">def delete_record(self, data: Dict[str, Any], exception: Exception):
     &#34;&#34;&#34;
     Delete record from the persistence store
 
     Parameters
     ----------
-    event: Dict[str, Any]
-        Lambda event
-    context: LambdaContext
-        Lambda context
+    data: Dict[str, Any]
+        Payload
     exception
-        The exception raised by the lambda handler
+        The exception raised by the function
     &#34;&#34;&#34;
-    data_record = DataRecord(idempotency_key=self._get_hashed_idempotency_key(event, context))
+    data_record = DataRecord(idempotency_key=self._get_hashed_idempotency_key(data=data))
 
     logger.debug(
-        f&#34;Lambda raised an exception ({type(exception).__name__}). Clearing in progress record in persistence &#34;
+        f&#34;Function raised an exception ({type(exception).__name__}). Clearing in progress record in persistence &#34;
         f&#34;store for idempotency key: {data_record.idempotency_key}&#34;
     )
-    self._delete_record(data_record)
+    self._delete_record(data_record=data_record)
 
-    self._delete_from_cache(data_record.idempotency_key)</code></pre>
+    self._delete_from_cache(idempotency_key=data_record.idempotency_key)</code></pre>
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.idempotency.BasePersistenceLayer.get_record"><code class="name flex">
-<span>def <span class="ident">get_record</span></span>(<span>self, event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>) ‑> <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.DataRecord" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.DataRecord">DataRecord</a></span>
+<span>def <span class="ident">get_record</span></span>(<span>self, data: Dict[str, Any]) ‑> <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.DataRecord" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.DataRecord">DataRecord</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Calculate idempotency key for lambda_event, then retrieve item from persistence store using idempotency key
-and return it as a DataRecord instance.and return it as a DataRecord instance.</p>
+<div class="desc"><p>Retrieve idempotency key for data provided, fetch from persistence store, and convert to DataRecord.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>event</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
-<dd>Lambda event</dd>
-<dt><strong><code>context</code></strong> :&ensp;<code>LambdaContext</code></dt>
-<dd>Lambda context</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
+<dd>Payload</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -687,23 +776,20 @@ and return it as a DataRecord instance.and return it as a DataRecord instance.</
 <dt><code>IdempotencyItemNotFoundError</code></dt>
 <dd>Exception raised if no record exists in persistence store with the idempotency key</dd>
 <dt><code>IdempotencyValidationError</code></dt>
-<dd>Event payload doesn't match the stored record for the given idempotency key</dd>
+<dd>Payload doesn't match the stored record for the given idempotency key</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_record(self, event: Dict[str, Any], context: LambdaContext) -&gt; DataRecord:
+<pre><code class="python">def get_record(self, data: Dict[str, Any]) -&gt; DataRecord:
     &#34;&#34;&#34;
-    Calculate idempotency key for lambda_event, then retrieve item from persistence store using idempotency key
-    and return it as a DataRecord instance.and return it as a DataRecord instance.
+    Retrieve idempotency key for data provided, fetch from persistence store, and convert to DataRecord.
 
     Parameters
     ----------
-    event: Dict[str, Any]
-        Lambda event
-    context: LambdaContext
-        Lambda context
+    data: Dict[str, Any]
+        Payload
 
     Returns
     -------
@@ -715,57 +801,53 @@ and return it as a DataRecord instance.and return it as a DataRecord instance.</
     IdempotencyItemNotFoundError
         Exception raised if no record exists in persistence store with the idempotency key
     IdempotencyValidationError
-        Event payload doesn&#39;t match the stored record for the given idempotency key
+        Payload doesn&#39;t match the stored record for the given idempotency key
     &#34;&#34;&#34;
 
-    idempotency_key = self._get_hashed_idempotency_key(event, context)
+    idempotency_key = self._get_hashed_idempotency_key(data=data)
 
     cached_record = self._retrieve_from_cache(idempotency_key=idempotency_key)
     if cached_record:
         logger.debug(f&#34;Idempotency record found in cache with idempotency key: {idempotency_key}&#34;)
-        self._validate_payload(event, cached_record)
+        self._validate_payload(data=data, data_record=cached_record)
         return cached_record
 
-    record = self._get_record(idempotency_key)
+    record = self._get_record(idempotency_key=idempotency_key)
 
     self._save_to_cache(data_record=record)
 
-    self._validate_payload(event, record)
+    self._validate_payload(data=data, data_record=record)
     return record</code></pre>
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.idempotency.BasePersistenceLayer.save_inprogress"><code class="name flex">
-<span>def <span class="ident">save_inprogress</span></span>(<span>self, event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>) ‑> None</span>
+<span>def <span class="ident">save_inprogress</span></span>(<span>self, data: Dict[str, Any]) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Save record of function's execution being in progress</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>event</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
-<dd>Lambda event</dd>
-<dt><strong><code>context</code></strong> :&ensp;<code>LambdaContext</code></dt>
-<dd>Lambda context</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
+<dd>Payload</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def save_inprogress(self, event: Dict[str, Any], context: LambdaContext) -&gt; None:
+<pre><code class="python">def save_inprogress(self, data: Dict[str, Any]) -&gt; None:
     &#34;&#34;&#34;
     Save record of function&#39;s execution being in progress
 
     Parameters
     ----------
-    event: Dict[str, Any]
-        Lambda event
-    context: LambdaContext
-        Lambda context
+    data: Dict[str, Any]
+        Payload
     &#34;&#34;&#34;
     data_record = DataRecord(
-        idempotency_key=self._get_hashed_idempotency_key(event, context),
+        idempotency_key=self._get_hashed_idempotency_key(data=data),
         status=STATUS_CONSTANTS[&#34;INPROGRESS&#34;],
         expiry_timestamp=self._get_expiry_timestamp(),
-        payload_hash=self._get_hashed_payload(event),
+        payload_hash=self._get_hashed_payload(data=data),
     )
 
     logger.debug(f&#34;Saving in progress record for idempotency key: {data_record.idempotency_key}&#34;)
@@ -773,56 +855,52 @@ and return it as a DataRecord instance.and return it as a DataRecord instance.</
     if self._retrieve_from_cache(idempotency_key=data_record.idempotency_key):
         raise IdempotencyItemAlreadyExistsError
 
-    self._put_record(data_record)</code></pre>
+    self._put_record(data_record=data_record)</code></pre>
 </details>
 </dd>
 <dt id="aws_lambda_powertools.utilities.idempotency.BasePersistenceLayer.save_success"><code class="name flex">
-<span>def <span class="ident">save_success</span></span>(<span>self, event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>, result: dict) ‑> None</span>
+<span>def <span class="ident">save_success</span></span>(<span>self, data: Dict[str, Any], result: dict) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Save record of function's execution completing successfully</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>event</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
-<dd>Lambda event</dd>
-<dt><strong><code>context</code></strong> :&ensp;<code>LambdaContext</code></dt>
-<dd>Lambda context</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
+<dd>Payload</dd>
 <dt><strong><code>result</code></strong> :&ensp;<code>dict</code></dt>
-<dd>The response from lambda handler</dd>
+<dd>The response from function</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def save_success(self, event: Dict[str, Any], context: LambdaContext, result: dict) -&gt; None:
+<pre><code class="python">def save_success(self, data: Dict[str, Any], result: dict) -&gt; None:
     &#34;&#34;&#34;
     Save record of function&#39;s execution completing successfully
 
     Parameters
     ----------
-    event: Dict[str, Any]
-        Lambda event
-    context: LambdaContext
-        Lambda context
+    data: Dict[str, Any]
+        Payload
     result: dict
-        The response from lambda handler
+        The response from function
     &#34;&#34;&#34;
     response_data = json.dumps(result, cls=Encoder)
 
     data_record = DataRecord(
-        idempotency_key=self._get_hashed_idempotency_key(event, context),
+        idempotency_key=self._get_hashed_idempotency_key(data=data),
         status=STATUS_CONSTANTS[&#34;COMPLETED&#34;],
         expiry_timestamp=self._get_expiry_timestamp(),
         response_data=response_data,
-        payload_hash=self._get_hashed_payload(event),
+        payload_hash=self._get_hashed_payload(data=data),
     )
     logger.debug(
-        f&#34;Lambda successfully executed. Saving record to persistence store with &#34;
+        f&#34;Function successfully executed. Saving record to persistence store with &#34;
         f&#34;idempotency key: {data_record.idempotency_key}&#34;
     )
     self._update_record(data_record=data_record)
 
-    self._save_to_cache(data_record)</code></pre>
+    self._save_to_cache(data_record=data_record)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1115,6 +1193,7 @@ and return it as a DataRecord instance.and return it as a DataRecord instance.</
 </li>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
+<li><code><a title="aws_lambda_powertools.utilities.idempotency.base" href="base.html">aws_lambda_powertools.utilities.idempotency.base</a></code></li>
 <li><code><a title="aws_lambda_powertools.utilities.idempotency.config" href="config.html">aws_lambda_powertools.utilities.idempotency.config</a></code></li>
 <li><code><a title="aws_lambda_powertools.utilities.idempotency.exceptions" href="exceptions.html">aws_lambda_powertools.utilities.idempotency.exceptions</a></code></li>
 <li><code><a title="aws_lambda_powertools.utilities.idempotency.idempotency" href="idempotency.html">aws_lambda_powertools.utilities.idempotency.idempotency</a></code></li>
@@ -1124,6 +1203,7 @@ and return it as a DataRecord instance.and return it as a DataRecord instance.</
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="aws_lambda_powertools.utilities.idempotency.idempotent" href="#aws_lambda_powertools.utilities.idempotency.idempotent">idempotent</a></code></li>
+<li><code><a title="aws_lambda_powertools.utilities.idempotency.idempotent_function" href="#aws_lambda_powertools.utilities.idempotency.idempotent_function">idempotent_function</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

@@ -30,25 +30,15 @@
 <pre><code class="python">&#34;&#34;&#34;
 Primary interface for idempotent Lambda functions utility
 &#34;&#34;&#34;
+import functools
 import logging
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, cast
 
 from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
+from aws_lambda_powertools.shared.types import AnyCallableT
+from aws_lambda_powertools.utilities.idempotency.base import IdempotencyHandler
 from aws_lambda_powertools.utilities.idempotency.config import IdempotencyConfig
-from aws_lambda_powertools.utilities.idempotency.exceptions import (
-    IdempotencyAlreadyInProgressError,
-    IdempotencyInconsistentStateError,
-    IdempotencyItemAlreadyExistsError,
-    IdempotencyItemNotFoundError,
-    IdempotencyKeyError,
-    IdempotencyPersistenceLayerError,
-    IdempotencyValidationError,
-)
-from aws_lambda_powertools.utilities.idempotency.persistence.base import (
-    STATUS_CONSTANTS,
-    BasePersistenceLayer,
-    DataRecord,
-)
+from aws_lambda_powertools.utilities.idempotency.persistence.base import BasePersistenceLayer
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
 logger = logging.getLogger(__name__)
@@ -61,9 +51,10 @@ def idempotent(
     context: LambdaContext,
     persistence_store: BasePersistenceLayer,
     config: Optional[IdempotencyConfig] = None,
+    **kwargs,
 ) -&gt; Any:
     &#34;&#34;&#34;
-    Middleware to handle idempotency
+    Decorator to handle idempotency
 
     Parameters
     ----------
@@ -95,177 +86,91 @@ def idempotent(
     &#34;&#34;&#34;
 
     config = config or IdempotencyConfig()
+    args = event, context
     idempotency_handler = IdempotencyHandler(
-        lambda_handler=handler, event=event, context=context, persistence_store=persistence_store, config=config
+        function=handler,
+        function_payload=event,
+        config=config,
+        persistence_store=persistence_store,
+        function_args=args,
+        function_kwargs=kwargs,
     )
 
-    # IdempotencyInconsistentStateError can happen under rare but expected cases when persistent state changes in the
-    # small time between put &amp; get requests. In most cases we can retry successfully on this exception.
-    # Maintenance: Allow customers to specify number of retries
-    max_handler_retries = 2
-    for i in range(max_handler_retries + 1):
-        try:
-            return idempotency_handler.handle()
-        except IdempotencyInconsistentStateError:
-            if i == max_handler_retries:
-                # Allow the exception to bubble up after max retries exceeded
-                raise
+    return idempotency_handler.handle()
 
 
-class IdempotencyHandler:
+def idempotent_function(
+    function: Optional[AnyCallableT] = None,
+    *,
+    data_keyword_argument: str,
+    persistence_store: BasePersistenceLayer,
+    config: Optional[IdempotencyConfig] = None,
+) -&gt; Any:
     &#34;&#34;&#34;
-    Class to orchestrate calls to persistence layer.
+    Decorator to handle idempotency of any function
+
+    Parameters
+    ----------
+    function: Callable
+        Function to be decorated
+    data_keyword_argument: str
+        Keyword parameter name in function&#39;s signature that we should hash as idempotency key, e.g. &#34;order&#34;
+    persistence_store: BasePersistenceLayer
+        Instance of BasePersistenceLayer to store data
+    config: IdempotencyConfig
+        Configuration
+
+    Examples
+    --------
+    **Processes an order in an idempotent manner**
+
+        from aws_lambda_powertools.utilities.idempotency import (
+           idempotent_function, DynamoDBPersistenceLayer, IdempotencyConfig
+        )
+
+        idem_config=IdempotencyConfig(event_key_jmespath=&#34;order_id&#34;)
+        persistence_layer = DynamoDBPersistenceLayer(table_name=&#34;idempotency_store&#34;)
+
+        @idempotent_function(data_keyword_argument=&#34;order&#34;, config=idem_config, persistence_store=persistence_layer)
+        def process_order(customer_id: str, order: dict, **kwargs):
+            return {&#34;StatusCode&#34;: 200}
     &#34;&#34;&#34;
 
-    def __init__(
-        self,
-        lambda_handler: Callable[[Any, LambdaContext], Any],
-        event: Dict[str, Any],
-        context: LambdaContext,
-        config: IdempotencyConfig,
-        persistence_store: BasePersistenceLayer,
-    ):
-        &#34;&#34;&#34;
-        Initialize the IdempotencyHandler
+    if function is None:
+        return cast(
+            AnyCallableT,
+            functools.partial(
+                idempotent_function,
+                data_keyword_argument=data_keyword_argument,
+                persistence_store=persistence_store,
+                config=config,
+            ),
+        )
 
-        Parameters
-        ----------
-        lambda_handler : Callable[[Any, LambdaContext], Any]
-            Lambda function handler
-        event : Dict[str, Any]
-            Event payload lambda handler will be called with
-        context : LambdaContext
-            Context object which will be passed to lambda handler
-        persistence_store : BasePersistenceLayer
-            Instance of persistence layer to store idempotency records
-        &#34;&#34;&#34;
-        persistence_store.configure(config)
-        self.persistence_store = persistence_store
-        self.context = context
-        self.event = event
-        self.lambda_handler = lambda_handler
+    config = config or IdempotencyConfig()
 
-    def handle(self) -&gt; Any:
-        &#34;&#34;&#34;
-        Main entry point for handling idempotent execution of lambda handler.
+    @functools.wraps(function)
+    def decorate(*args, **kwargs):
+        payload = kwargs.get(data_keyword_argument)
 
-        Returns
-        -------
-        Any
-            lambda handler response
-
-        &#34;&#34;&#34;
-        try:
-            # We call save_inprogress first as an optimization for the most common case where no idempotent record
-            # already exists. If it succeeds, there&#39;s no need to call get_record.
-            self.persistence_store.save_inprogress(event=self.event, context=self.context)
-        except IdempotencyKeyError:
-            raise
-        except IdempotencyItemAlreadyExistsError:
-            # Now we know the item already exists, we can retrieve it
-            record = self._get_idempotency_record()
-            return self._handle_for_status(record)
-        except Exception as exc:
-            raise IdempotencyPersistenceLayerError(&#34;Failed to save in progress record to idempotency store&#34;) from exc
-
-        return self._call_lambda_handler()
-
-    def _get_idempotency_record(self) -&gt; DataRecord:
-        &#34;&#34;&#34;
-        Retrieve the idempotency record from the persistence layer.
-
-        Raises
-        ----------
-        IdempotencyInconsistentStateError
-
-        &#34;&#34;&#34;
-        try:
-            event_record = self.persistence_store.get_record(event=self.event, context=self.context)
-        except IdempotencyItemNotFoundError:
-            # This code path will only be triggered if the record is removed between save_inprogress and get_record.
-            logger.debug(
-                &#34;An existing idempotency record was deleted before we could retrieve it. Proceeding with lambda &#34;
-                &#34;handler&#34;
-            )
-            raise IdempotencyInconsistentStateError(&#34;save_inprogress and get_record return inconsistent results.&#34;)
-
-        # Allow this exception to bubble up
-        except IdempotencyValidationError:
-            raise
-
-        # Wrap remaining unhandled exceptions with IdempotencyPersistenceLayerError to ease exception handling for
-        # clients
-        except Exception as exc:
-            raise IdempotencyPersistenceLayerError(&#34;Failed to get record from idempotency store&#34;) from exc
-
-        return event_record
-
-    def _handle_for_status(self, event_record: DataRecord) -&gt; Optional[Dict[Any, Any]]:
-        &#34;&#34;&#34;
-        Take appropriate action based on event_record&#39;s status
-
-        Parameters
-        ----------
-        event_record: DataRecord
-
-        Returns
-        -------
-        Optional[Dict[Any, Any]
-            Lambda response previously used for this idempotency key, if it has successfully executed already.
-
-        Raises
-        ------
-        AlreadyInProgressError
-            A lambda execution is already in progress
-        IdempotencyInconsistentStateError
-            The persistence store reports inconsistent states across different requests. Retryable.
-        &#34;&#34;&#34;
-        # This code path will only be triggered if the record becomes expired between the save_inprogress call and here
-        if event_record.status == STATUS_CONSTANTS[&#34;EXPIRED&#34;]:
-            raise IdempotencyInconsistentStateError(&#34;save_inprogress and get_record return inconsistent results.&#34;)
-
-        if event_record.status == STATUS_CONSTANTS[&#34;INPROGRESS&#34;]:
-            raise IdempotencyAlreadyInProgressError(
-                f&#34;Execution already in progress with idempotency key: &#34;
-                f&#34;{self.persistence_store.event_key_jmespath}={event_record.idempotency_key}&#34;
+        if payload is None:
+            raise RuntimeError(
+                f&#34;Unable to extract &#39;{data_keyword_argument}&#39; from keyword arguments.&#34;
+                f&#34; Ensure this exists in your function&#39;s signature as well as the caller used it as a keyword argument&#34;
             )
 
-        return event_record.response_json_as_dict()
+        idempotency_handler = IdempotencyHandler(
+            function=function,
+            function_payload=payload,
+            config=config,
+            persistence_store=persistence_store,
+            function_args=args,
+            function_kwargs=kwargs,
+        )
 
-    def _call_lambda_handler(self) -&gt; Any:
-        &#34;&#34;&#34;
-        Call the lambda handler function and update the persistence store appropriate depending on the output
+        return idempotency_handler.handle()
 
-        Returns
-        -------
-        Any
-            lambda handler response
-
-        &#34;&#34;&#34;
-        try:
-            handler_response = self.lambda_handler(self.event, self.context)
-        except Exception as handler_exception:
-            # We need these nested blocks to preserve lambda handler exception in case the persistence store operation
-            # also raises an exception
-            try:
-                self.persistence_store.delete_record(
-                    event=self.event, context=self.context, exception=handler_exception
-                )
-            except Exception as delete_exception:
-                raise IdempotencyPersistenceLayerError(
-                    &#34;Failed to delete record from idempotency store&#34;
-                ) from delete_exception
-            raise
-
-        else:
-            try:
-                self.persistence_store.save_success(event=self.event, context=self.context, result=handler_response)
-            except Exception as save_exception:
-                raise IdempotencyPersistenceLayerError(
-                    &#34;Failed to update record state to success in idempotency store&#34;
-                ) from save_exception
-
-        return handler_response</code></pre>
+    return cast(AnyCallableT, decorate)</code></pre>
 </details>
 </section>
 <section>
@@ -276,10 +181,10 @@ class IdempotencyHandler:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="aws_lambda_powertools.utilities.idempotency.idempotency.idempotent"><code class="name flex">
-<span>def <span class="ident">idempotent</span></span>(<span>handler: Callable[[Any, aws_lambda_powertools.utilities.lambda_context.LambdaContext], Any], event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>, persistence_store: <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer">BasePersistenceLayer</a>, config: Optional[<a title="aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig" href="config.html#aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig">IdempotencyConfig</a>] = None) ‑> Any</span>
+<span>def <span class="ident">idempotent</span></span>(<span>handler: Callable[[Any, aws_lambda_powertools.utilities.lambda_context.LambdaContext], Any], event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>, persistence_store: <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer">BasePersistenceLayer</a>, config: Optional[<a title="aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig" href="config.html#aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig">IdempotencyConfig</a>] = None, **kwargs) ‑> Any</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Middleware to handle idempotency</p>
+<div class="desc"><p>Decorator to handle idempotency</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>handler</code></strong> :&ensp;<code>Callable</code></dt>
@@ -317,9 +222,10 @@ def idempotent(
     context: LambdaContext,
     persistence_store: BasePersistenceLayer,
     config: Optional[IdempotencyConfig] = None,
+    **kwargs,
 ) -&gt; Any:
     &#34;&#34;&#34;
-    Middleware to handle idempotency
+    Decorator to handle idempotency
 
     Parameters
     ----------
@@ -351,250 +257,129 @@ def idempotent(
     &#34;&#34;&#34;
 
     config = config or IdempotencyConfig()
+    args = event, context
     idempotency_handler = IdempotencyHandler(
-        lambda_handler=handler, event=event, context=context, persistence_store=persistence_store, config=config
+        function=handler,
+        function_payload=event,
+        config=config,
+        persistence_store=persistence_store,
+        function_args=args,
+        function_kwargs=kwargs,
     )
 
-    # IdempotencyInconsistentStateError can happen under rare but expected cases when persistent state changes in the
-    # small time between put &amp; get requests. In most cases we can retry successfully on this exception.
-    # Maintenance: Allow customers to specify number of retries
-    max_handler_retries = 2
-    for i in range(max_handler_retries + 1):
-        try:
-            return idempotency_handler.handle()
-        except IdempotencyInconsistentStateError:
-            if i == max_handler_retries:
-                # Allow the exception to bubble up after max retries exceeded
-                raise</code></pre>
+    return idempotency_handler.handle()</code></pre>
+</details>
+</dd>
+<dt id="aws_lambda_powertools.utilities.idempotency.idempotency.idempotent_function"><code class="name flex">
+<span>def <span class="ident">idempotent_function</span></span>(<span>function: Optional[~AnyCallableT] = None, *, data_keyword_argument: str, persistence_store: <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer">BasePersistenceLayer</a>, config: Optional[<a title="aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig" href="config.html#aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig">IdempotencyConfig</a>] = None) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decorator to handle idempotency of any function</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>function</code></strong> :&ensp;<code>Callable</code></dt>
+<dd>Function to be decorated</dd>
+<dt><strong><code>data_keyword_argument</code></strong> :&ensp;<code>str</code></dt>
+<dd>Keyword parameter name in function's signature that we should hash as idempotency key, e.g. "order"</dd>
+<dt><strong><code>persistence_store</code></strong> :&ensp;<code>BasePersistenceLayer</code></dt>
+<dd>Instance of BasePersistenceLayer to store data</dd>
+<dt><strong><code>config</code></strong> :&ensp;<code>IdempotencyConfig</code></dt>
+<dd>Configuration</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p><strong>Processes an order in an idempotent manner</strong></p>
+<pre><code>from aws_lambda_powertools.utilities.idempotency import (
+   idempotent_function, DynamoDBPersistenceLayer, IdempotencyConfig
+)
+
+idem_config=IdempotencyConfig(event_key_jmespath="order_id")
+persistence_layer = DynamoDBPersistenceLayer(table_name="idempotency_store")
+
+@idempotent_function(data_keyword_argument="order", config=idem_config, persistence_store=persistence_layer)
+def process_order(customer_id: str, order: dict, **kwargs):
+    return {"StatusCode": 200}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def idempotent_function(
+    function: Optional[AnyCallableT] = None,
+    *,
+    data_keyword_argument: str,
+    persistence_store: BasePersistenceLayer,
+    config: Optional[IdempotencyConfig] = None,
+) -&gt; Any:
+    &#34;&#34;&#34;
+    Decorator to handle idempotency of any function
+
+    Parameters
+    ----------
+    function: Callable
+        Function to be decorated
+    data_keyword_argument: str
+        Keyword parameter name in function&#39;s signature that we should hash as idempotency key, e.g. &#34;order&#34;
+    persistence_store: BasePersistenceLayer
+        Instance of BasePersistenceLayer to store data
+    config: IdempotencyConfig
+        Configuration
+
+    Examples
+    --------
+    **Processes an order in an idempotent manner**
+
+        from aws_lambda_powertools.utilities.idempotency import (
+           idempotent_function, DynamoDBPersistenceLayer, IdempotencyConfig
+        )
+
+        idem_config=IdempotencyConfig(event_key_jmespath=&#34;order_id&#34;)
+        persistence_layer = DynamoDBPersistenceLayer(table_name=&#34;idempotency_store&#34;)
+
+        @idempotent_function(data_keyword_argument=&#34;order&#34;, config=idem_config, persistence_store=persistence_layer)
+        def process_order(customer_id: str, order: dict, **kwargs):
+            return {&#34;StatusCode&#34;: 200}
+    &#34;&#34;&#34;
+
+    if function is None:
+        return cast(
+            AnyCallableT,
+            functools.partial(
+                idempotent_function,
+                data_keyword_argument=data_keyword_argument,
+                persistence_store=persistence_store,
+                config=config,
+            ),
+        )
+
+    config = config or IdempotencyConfig()
+
+    @functools.wraps(function)
+    def decorate(*args, **kwargs):
+        payload = kwargs.get(data_keyword_argument)
+
+        if payload is None:
+            raise RuntimeError(
+                f&#34;Unable to extract &#39;{data_keyword_argument}&#39; from keyword arguments.&#34;
+                f&#34; Ensure this exists in your function&#39;s signature as well as the caller used it as a keyword argument&#34;
+            )
+
+        idempotency_handler = IdempotencyHandler(
+            function=function,
+            function_payload=payload,
+            config=config,
+            persistence_store=persistence_store,
+            function_args=args,
+            function_kwargs=kwargs,
+        )
+
+        return idempotency_handler.handle()
+
+    return cast(AnyCallableT, decorate)</code></pre>
 </details>
 </dd>
 </dl>
 </section>
 <section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="aws_lambda_powertools.utilities.idempotency.idempotency.IdempotencyHandler"><code class="flex name class">
-<span>class <span class="ident">IdempotencyHandler</span></span>
-<span>(</span><span>lambda_handler: Callable[[Any, aws_lambda_powertools.utilities.lambda_context.LambdaContext], Any], event: Dict[str, Any], context: <a title="aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext" href="../typing/lambda_context.html#aws_lambda_powertools.utilities.typing.lambda_context.LambdaContext">LambdaContext</a>, config: <a title="aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig" href="config.html#aws_lambda_powertools.utilities.idempotency.config.IdempotencyConfig">IdempotencyConfig</a>, persistence_store: <a title="aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer" href="persistence/base.html#aws_lambda_powertools.utilities.idempotency.persistence.base.BasePersistenceLayer">BasePersistenceLayer</a>)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Class to orchestrate calls to persistence layer.</p>
-<p>Initialize the IdempotencyHandler</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>lambda_handler</code></strong> :&ensp;<code>Callable[[Any, LambdaContext], Any]</code></dt>
-<dd>Lambda function handler</dd>
-<dt><strong><code>event</code></strong> :&ensp;<code>Dict[str, Any]</code></dt>
-<dd>Event payload lambda handler will be called with</dd>
-<dt><strong><code>context</code></strong> :&ensp;<code>LambdaContext</code></dt>
-<dd>Context object which will be passed to lambda handler</dd>
-<dt><strong><code>persistence_store</code></strong> :&ensp;<code>BasePersistenceLayer</code></dt>
-<dd>Instance of persistence layer to store idempotency records</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class IdempotencyHandler:
-    &#34;&#34;&#34;
-    Class to orchestrate calls to persistence layer.
-    &#34;&#34;&#34;
-
-    def __init__(
-        self,
-        lambda_handler: Callable[[Any, LambdaContext], Any],
-        event: Dict[str, Any],
-        context: LambdaContext,
-        config: IdempotencyConfig,
-        persistence_store: BasePersistenceLayer,
-    ):
-        &#34;&#34;&#34;
-        Initialize the IdempotencyHandler
-
-        Parameters
-        ----------
-        lambda_handler : Callable[[Any, LambdaContext], Any]
-            Lambda function handler
-        event : Dict[str, Any]
-            Event payload lambda handler will be called with
-        context : LambdaContext
-            Context object which will be passed to lambda handler
-        persistence_store : BasePersistenceLayer
-            Instance of persistence layer to store idempotency records
-        &#34;&#34;&#34;
-        persistence_store.configure(config)
-        self.persistence_store = persistence_store
-        self.context = context
-        self.event = event
-        self.lambda_handler = lambda_handler
-
-    def handle(self) -&gt; Any:
-        &#34;&#34;&#34;
-        Main entry point for handling idempotent execution of lambda handler.
-
-        Returns
-        -------
-        Any
-            lambda handler response
-
-        &#34;&#34;&#34;
-        try:
-            # We call save_inprogress first as an optimization for the most common case where no idempotent record
-            # already exists. If it succeeds, there&#39;s no need to call get_record.
-            self.persistence_store.save_inprogress(event=self.event, context=self.context)
-        except IdempotencyKeyError:
-            raise
-        except IdempotencyItemAlreadyExistsError:
-            # Now we know the item already exists, we can retrieve it
-            record = self._get_idempotency_record()
-            return self._handle_for_status(record)
-        except Exception as exc:
-            raise IdempotencyPersistenceLayerError(&#34;Failed to save in progress record to idempotency store&#34;) from exc
-
-        return self._call_lambda_handler()
-
-    def _get_idempotency_record(self) -&gt; DataRecord:
-        &#34;&#34;&#34;
-        Retrieve the idempotency record from the persistence layer.
-
-        Raises
-        ----------
-        IdempotencyInconsistentStateError
-
-        &#34;&#34;&#34;
-        try:
-            event_record = self.persistence_store.get_record(event=self.event, context=self.context)
-        except IdempotencyItemNotFoundError:
-            # This code path will only be triggered if the record is removed between save_inprogress and get_record.
-            logger.debug(
-                &#34;An existing idempotency record was deleted before we could retrieve it. Proceeding with lambda &#34;
-                &#34;handler&#34;
-            )
-            raise IdempotencyInconsistentStateError(&#34;save_inprogress and get_record return inconsistent results.&#34;)
-
-        # Allow this exception to bubble up
-        except IdempotencyValidationError:
-            raise
-
-        # Wrap remaining unhandled exceptions with IdempotencyPersistenceLayerError to ease exception handling for
-        # clients
-        except Exception as exc:
-            raise IdempotencyPersistenceLayerError(&#34;Failed to get record from idempotency store&#34;) from exc
-
-        return event_record
-
-    def _handle_for_status(self, event_record: DataRecord) -&gt; Optional[Dict[Any, Any]]:
-        &#34;&#34;&#34;
-        Take appropriate action based on event_record&#39;s status
-
-        Parameters
-        ----------
-        event_record: DataRecord
-
-        Returns
-        -------
-        Optional[Dict[Any, Any]
-            Lambda response previously used for this idempotency key, if it has successfully executed already.
-
-        Raises
-        ------
-        AlreadyInProgressError
-            A lambda execution is already in progress
-        IdempotencyInconsistentStateError
-            The persistence store reports inconsistent states across different requests. Retryable.
-        &#34;&#34;&#34;
-        # This code path will only be triggered if the record becomes expired between the save_inprogress call and here
-        if event_record.status == STATUS_CONSTANTS[&#34;EXPIRED&#34;]:
-            raise IdempotencyInconsistentStateError(&#34;save_inprogress and get_record return inconsistent results.&#34;)
-
-        if event_record.status == STATUS_CONSTANTS[&#34;INPROGRESS&#34;]:
-            raise IdempotencyAlreadyInProgressError(
-                f&#34;Execution already in progress with idempotency key: &#34;
-                f&#34;{self.persistence_store.event_key_jmespath}={event_record.idempotency_key}&#34;
-            )
-
-        return event_record.response_json_as_dict()
-
-    def _call_lambda_handler(self) -&gt; Any:
-        &#34;&#34;&#34;
-        Call the lambda handler function and update the persistence store appropriate depending on the output
-
-        Returns
-        -------
-        Any
-            lambda handler response
-
-        &#34;&#34;&#34;
-        try:
-            handler_response = self.lambda_handler(self.event, self.context)
-        except Exception as handler_exception:
-            # We need these nested blocks to preserve lambda handler exception in case the persistence store operation
-            # also raises an exception
-            try:
-                self.persistence_store.delete_record(
-                    event=self.event, context=self.context, exception=handler_exception
-                )
-            except Exception as delete_exception:
-                raise IdempotencyPersistenceLayerError(
-                    &#34;Failed to delete record from idempotency store&#34;
-                ) from delete_exception
-            raise
-
-        else:
-            try:
-                self.persistence_store.save_success(event=self.event, context=self.context, result=handler_response)
-            except Exception as save_exception:
-                raise IdempotencyPersistenceLayerError(
-                    &#34;Failed to update record state to success in idempotency store&#34;
-                ) from save_exception
-
-        return handler_response</code></pre>
-</details>
-<h3>Methods</h3>
-<dl>
-<dt id="aws_lambda_powertools.utilities.idempotency.idempotency.IdempotencyHandler.handle"><code class="name flex">
-<span>def <span class="ident">handle</span></span>(<span>self) ‑> Any</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Main entry point for handling idempotent execution of lambda handler.</p>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>Any</code></dt>
-<dd>lambda handler response</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def handle(self) -&gt; Any:
-    &#34;&#34;&#34;
-    Main entry point for handling idempotent execution of lambda handler.
-
-    Returns
-    -------
-    Any
-        lambda handler response
-
-    &#34;&#34;&#34;
-    try:
-        # We call save_inprogress first as an optimization for the most common case where no idempotent record
-        # already exists. If it succeeds, there&#39;s no need to call get_record.
-        self.persistence_store.save_inprogress(event=self.event, context=self.context)
-    except IdempotencyKeyError:
-        raise
-    except IdempotencyItemAlreadyExistsError:
-        # Now we know the item already exists, we can retrieve it
-        record = self._get_idempotency_record()
-        return self._handle_for_status(record)
-    except Exception as exc:
-        raise IdempotencyPersistenceLayerError(&#34;Failed to save in progress record to idempotency store&#34;) from exc
-
-    return self._call_lambda_handler()</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
-</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -611,16 +396,7 @@ def idempotent(
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="aws_lambda_powertools.utilities.idempotency.idempotency.idempotent" href="#aws_lambda_powertools.utilities.idempotency.idempotency.idempotent">idempotent</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="aws_lambda_powertools.utilities.idempotency.idempotency.IdempotencyHandler" href="#aws_lambda_powertools.utilities.idempotency.idempotency.IdempotencyHandler">IdempotencyHandler</a></code></h4>
-<ul class="">
-<li><code><a title="aws_lambda_powertools.utilities.idempotency.idempotency.IdempotencyHandler.handle" href="#aws_lambda_powertools.utilities.idempotency.idempotency.IdempotencyHandler.handle">handle</a></code></li>
-</ul>
-</li>
+<li><code><a title="aws_lambda_powertools.utilities.idempotency.idempotency.idempotent_function" href="#aws_lambda_powertools.utilities.idempotency.idempotency.idempotent_function">idempotent_function</a></code></li>
 </ul>
 </li>
 </ul>
