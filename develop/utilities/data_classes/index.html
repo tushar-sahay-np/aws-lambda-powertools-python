@@ -1177,15 +1177,11 @@ documentation inherently (via autocompletion, types and docstrings).</p>
 <blockquote>
 <p>New in 1.20.0</p>
 </blockquote>
-<p>It is used for API Gateway Rest API lambda authorizer payload. See docs on
-<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html" target="_blank">Use API Gateway Lambda authorizers</a>
-for more details. Use <code>APIGatewayAuthorizerRequestEvent</code> for type "REQUEST" and <code>APIGatewayAuthorizerTokenEvent</code> for
-type "TOKEN".</p>
-<p>Below is 2 examples of a Rest API lambda authorizer. One looking up user details by <code>Authorization</code> header and using
-<code>APIGatewayAuthorizerResponse</code> to return the declined response when user is not found or authorized and include
-the user details in the request context and full access for admin users. And another using
-<code>APIGatewayAuthorizerTokenEvent</code> to get the <code>authorization_token</code>.</p>
+<p>It is used for <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html" target="_blank">API Gateway Rest API Lambda Authorizer payload</a>.</p>
+<p>Use <strong><code>APIGatewayAuthorizerRequestEvent</code></strong> for type <code>REQUEST</code> and <strong><code>APIGatewayAuthorizerTokenEvent</code></strong> for type <code>TOKEN</code>.</p>
 <div class="tabbed-set" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">app_type_request.py</label><div class="tabbed-content">
+<p>This example uses the <code>APIGatewayAuthorizerResponse</code> to decline a given request if the user is not found.</p>
+<p>When the user is found, it includes the user details in the request context that will be available to the back-end, and returns a full access policy for admin users.</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1227,12 +1223,18 @@ the user details in the request context and full access for admin users. And ano
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes</span> <span class="kn">import</span> <span class="n">event_source</span>
-<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">APIGatewayAuthorizerRequestEvent</span><span class="p">,</span>
-    <span class="n">APIGatewayAuthorizerResponse</span><span class="p">,</span>
-    <span class="n">HttpVerb</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes</span> <span class="kn">import</span> <span class="n">event_source</span>
+<span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span class="hll">    <span class="n">APIGatewayAuthorizerRequestEvent</span><span class="p">,</span>
+</span><span class="hll">    <span class="n">APIGatewayAuthorizerResponse</span><span class="p">,</span>
+</span><span class="hll">    <span class="n">HttpVerb</span><span class="p">,</span>
+</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">secrets</span> <span class="kn">import</span> <span class="n">compare_digest</span>
 
 
@@ -1252,74 +1254,33 @@ the user details in the request context and full access for admin users. And ano
     <span class="c1"># parse the `methodArn` as an `APIGatewayRouteArn`</span>
     <span class="n">arn</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">parsed_arn</span>
     <span class="c1"># Create the response builder from parts of the `methodArn`</span>
-    <span class="n">builder</span> <span class="o">=</span> <span class="n">APIGatewayAuthorizerResponse</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">region</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">aws_account_id</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">api_id</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span>
+<span class="hll">    <span class="n">policy</span> <span class="o">=</span> <span class="n">APIGatewayAuthorizerResponse</span><span class="p">(</span>
+</span><span class="hll">        <span class="n">principal_id</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">region</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">region</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">aws_account_id</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">aws_account_id</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">api_id</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">api_id</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">stage</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">stage</span>
+</span>    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># No user was found, so we return not authorized</span>
-        <span class="n">builder</span><span class="o">.</span><span class="n">deny_all_routes</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
-
+<span class="hll">        <span class="n">policy</span><span class="o">.</span><span class="n">deny_all_routes</span><span class="p">()</span>
+</span><span class="hll">        <span class="k">return</span> <span class="n">policy</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+</span>
     <span class="c1"># Found the user and setting the details in the context</span>
-    <span class="n">builder</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">user</span>
-
+<span class="hll">    <span class="n">policy</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">user</span>
+</span>
     <span class="c1"># Conditional IAM Policy</span>
     <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isAdmin&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="n">builder</span><span class="o">.</span><span class="n">allow_all_routes</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">builder</span><span class="o">.</span><span class="n">allow_route</span><span class="p">(</span><span class="n">HttpVerb</span><span class="o">.</span><span class="n">GET</span><span class="p">,</span> <span class="s2">&quot;/user-profile&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+<span class="hll">        <span class="n">policy</span><span class="o">.</span><span class="n">allow_all_routes</span><span class="p">()</span>
+</span>    <span class="k">else</span><span class="p">:</span>
+<span class="hll">        <span class="n">policy</span><span class="o">.</span><span class="n">allow_route</span><span class="p">(</span><span class="n">HttpVerb</span><span class="o">.</span><span class="n">GET</span><span class="p">,</span> <span class="s2">&quot;/user-profile&quot;</span><span class="p">)</span>
+</span>
+    <span class="k">return</span> <span class="n">policy</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 </code></pre></div>
 </td></tr></table>
 </div>
 <input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><label for="__tabbed_3_2">app_type_token.py</label><div class="tabbed-content">
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes</span> <span class="kn">import</span> <span class="n">event_source</span>
-<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">APIGatewayAuthorizerTokenEvent</span><span class="p">,</span>
-    <span class="n">APIGatewayAuthorizerResponse</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="nd">@event_source</span><span class="p">(</span><span class="n">data_class</span><span class="o">=</span><span class="n">APIGatewayAuthorizerTokenEvent</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">APIGatewayAuthorizerTokenEvent</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-    <span class="n">arn</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">parsed_arn</span>
-    <span class="n">builder</span> <span class="o">=</span> <span class="n">APIGatewayAuthorizerResponse</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">region</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">aws_account_id</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">api_id</span><span class="p">,</span> <span class="n">arn</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">authorization_token</span> <span class="o">==</span> <span class="s2">&quot;42&quot;</span><span class="p">:</span>
-        <span class="n">builder</span><span class="o">.</span><span class="n">allow_all_methods</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">builder</span><span class="o">.</span><span class="n">deny_all_methods</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
-</code></pre></div>
-</td></tr></table>
-</div>
-</div>
-<h3 id="api-gateway-authorizer-v2">API Gateway Authorizer V2<a class="headerlink" href="#api-gateway-authorizer-v2" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>New in 1.20.0</p>
-</blockquote>
-<p>It is used for API Gateway HTTP API lambda authorizer payload version 2. See blog post
-<a href="https://aws.amazon.com/blogs/compute/introducing-iam-and-lambda-authorizers-for-amazon-api-gateway-http-apis/" target="_blank">Introducing IAM and Lambda authorizers for Amazon API Gateway HTTP APIs</a>
-or <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html" target="_blank">Working with AWS Lambda authorizers for HTTP APIs</a>
-for more details</p>
-<p>Below is a simple example of an HTTP API lambda authorizer looking up user details by <code>x-token</code> header and using
-<code>APIGatewayAuthorizerResponseV2</code> to return the declined response when user is not found or authorized and include
-the user details in the request context.</p>
-<div class="tabbed-set" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">app.py</label><div class="tabbed-content">
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1344,11 +1305,70 @@ the user details in the request context.</p>
 <span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes</span> <span class="kn">import</span> <span class="n">event_source</span>
-<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">APIGatewayAuthorizerEventV2</span><span class="p">,</span>
-    <span class="n">APIGatewayAuthorizerResponseV2</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">secrets</span> <span class="kn">import</span> <span class="n">compare_digest</span>
+<span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span class="hll">    <span class="n">APIGatewayAuthorizerTokenEvent</span><span class="p">,</span>
+</span><span class="hll">    <span class="n">APIGatewayAuthorizerResponse</span><span class="p">,</span>
+</span><span class="hll"><span class="p">)</span>
+</span>
+
+<span class="nd">@event_source</span><span class="p">(</span><span class="n">data_class</span><span class="o">=</span><span class="n">APIGatewayAuthorizerTokenEvent</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">APIGatewayAuthorizerTokenEvent</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="n">arn</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">parsed_arn</span>
+
+<span class="hll">    <span class="n">policy</span> <span class="o">=</span> <span class="n">APIGatewayAuthorizerResponse</span><span class="p">(</span>
+</span><span class="hll">        <span class="n">principal_id</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">region</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">region</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">aws_account_id</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">aws_account_id</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">api_id</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">api_id</span><span class="p">,</span>
+</span><span class="hll">        <span class="n">stage</span><span class="o">=</span><span class="n">arn</span><span class="o">.</span><span class="n">stage</span>
+</span><span class="hll">    <span class="p">)</span>
+</span>
+    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">authorization_token</span> <span class="o">==</span> <span class="s2">&quot;42&quot;</span><span class="p">:</span>
+<span class="hll">        <span class="n">policy</span><span class="o">.</span><span class="n">allow_all_routes</span><span class="p">()</span>
+</span>    <span class="k">else</span><span class="p">:</span>
+<span class="hll">        <span class="n">policy</span><span class="o">.</span><span class="n">deny_all_routes</span><span class="p">()</span>
+</span><span class="hll">    <span class="k">return</span> <span class="n">policy</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+</span></code></pre></div>
+</td></tr></table>
+</div>
+</div>
+<h3 id="api-gateway-authorizer-v2">API Gateway Authorizer V2<a class="headerlink" href="#api-gateway-authorizer-v2" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>New in 1.20.0</p>
+</blockquote>
+<p>It is used for <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html" target="_blank">API Gateway HTTP API Lambda Authorizer payload version 2</a>.
+See also <a href="https://aws.amazon.com/blogs/compute/introducing-iam-and-lambda-authorizers-for-amazon-api-gateway-http-apis/" target="_blank">this blog post</a> for more details.</p>
+<div class="tabbed-set" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">app.py</label><div class="tabbed-content">
+<p>This example looks up user details via <code>x-token</code> header. It uses <code>APIGatewayAuthorizerResponseV2</code> to return a deny policy when user is not found or authorized.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes</span> <span class="kn">import</span> <span class="n">event_source</span>
+<span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes.api_gateway_authorizer_event</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span class="hll">    <span class="n">APIGatewayAuthorizerEventV2</span><span class="p">,</span>
+</span><span class="hll">    <span class="n">APIGatewayAuthorizerResponseV2</span><span class="p">,</span>
+</span><span class="hll"><span class="p">)</span>
+</span><span class="kn">from</span> <span class="nn">secrets</span> <span class="kn">import</span> <span class="n">compare_digest</span>
 
 
 <span class="k">def</span> <span class="nf">get_user_by_token</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
@@ -1363,11 +1383,11 @@ the user details in the request context.</p>
 
     <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># No user was found, so we return not authorized</span>
-        <span class="k">return</span> <span class="n">APIGatewayAuthorizerResponseV2</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
-
+<span class="hll">        <span class="k">return</span> <span class="n">APIGatewayAuthorizerResponseV2</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+</span>
     <span class="c1"># Found the user and setting the details in the context</span>
-    <span class="k">return</span> <span class="n">APIGatewayAuthorizerResponseV2</span><span class="p">(</span><span class="n">authorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
-</code></pre></div>
+<span class="hll">    <span class="k">return</span> <span class="n">APIGatewayAuthorizerResponseV2</span><span class="p">(</span><span class="n">authorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+</span></code></pre></div>
 </td></tr></table>
 </div>
 </div>
