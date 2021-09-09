@@ -1517,7 +1517,7 @@ or read the Amplify documentation on using <a href="https://docs.amplify.aws/lib
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
         <span class="c1"># No user found, return not authorized</span>
-        <span class="k">return</span> <span class="n">AppSyncAuthorizerResponse</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">AppSyncAuthorizerResponse</span><span class="p">()</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">AppSyncAuthorizerResponse</span><span class="p">(</span>
         <span class="n">authorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -2533,7 +2533,7 @@ or plain text, depending on the original payload.</p>
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-08-21
+      Last update: 2021-09-09
     
   </small>
 </div>
