@@ -737,6 +737,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#getting-fetched-configuration" class="md-nav__link">
+    Getting fetched configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#built-in-store-provider" class="md-nav__link">
     Built-in store provider
   </a>
@@ -954,6 +961,13 @@
           <li class="md-nav__item">
   <a href="#envelope" class="md-nav__link">
     Envelope
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-fetched-configuration" class="md-nav__link">
+    Getting fetched configuration
   </a>
   
 </li>
@@ -1823,6 +1837,36 @@ app_config = AppConfigStore(
 </td></tr></table>
 </div>
 </div>
+<h3 id="getting-fetched-configuration">Getting fetched configuration<a class="headerlink" href="#getting-fetched-configuration" title="Permanent link">&para;</a></h3>
+<p>You can access the configuration fetched from the store via <code>get_raw_configuration</code> property within the store instance.</p>
+<div class="tabbed-set" data-tabs="9:1"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><label for="__tabbed_9_1">app.py</label><div class="tabbed-content">
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.feature_flags</span> <span class="kn">import</span> <span class="n">FeatureFlags</span><span class="p">,</span> <span class="n">AppConfigStore</span>
+
+<span class="n">app_config</span> <span class="o">=</span> <span class="n">AppConfigStore</span><span class="p">(</span>
+    <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;dev&quot;</span><span class="p">,</span>
+    <span class="n">application</span><span class="o">=</span><span class="s2">&quot;product-catalogue&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;configuration&quot;</span><span class="p">,</span>
+    <span class="n">envelope</span> <span class="o">=</span> <span class="s2">&quot;feature_flags&quot;</span>
+<span class="p">)</span>
+
+<span class="n">feature_flags</span> <span class="o">=</span> <span class="n">FeatureFlags</span><span class="p">(</span><span class="n">store</span><span class="o">=</span><span class="n">app_config</span><span class="p">)</span>
+
+<span class="hll"><span class="n">config</span> <span class="o">=</span> <span class="n">app_config</span><span class="o">.</span><span class="n">get_raw_configuration</span>
+</span></code></pre></div>
+</td></tr></table>
+</div>
+</div>
 <h3 id="built-in-store-provider">Built-in store provider<a class="headerlink" href="#built-in-store-provider" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">For GA, you'll be able to bring your own store.</p>
@@ -1876,7 +1920,7 @@ app_config = AppConfigStore(
 </tr>
 </tbody>
 </table>
-<div class="tabbed-set" data-tabs="9:1"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><label for="__tabbed_9_1">appconfig_store_example.py</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="10:1"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><label for="__tabbed_10_1">appconfig_store_example.py</label><div class="tabbed-content">
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1938,7 +1982,7 @@ app_config = AppConfigStore(
 <div class="admonition warning">
 <p class="admonition-title">This excerpt relies on <code>pytest</code> and <code>pytest-mock</code> dependencies</p>
 </div>
-<div class="tabbed-set" data-tabs="10:1"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><label for="__tabbed_10_1">test_feature_flags_independently.py</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="11:1"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><label for="__tabbed_11_1">test_feature_flags_independently.py</label><div class="tabbed-content">
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -2081,7 +2125,7 @@ app_config = AppConfigStore(
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-08-15
+      Last update: 2021-10-01
     
   </small>
 </div>
