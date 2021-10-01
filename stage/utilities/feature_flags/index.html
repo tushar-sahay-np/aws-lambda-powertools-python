@@ -782,6 +782,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#deprecation-list-when-ga" class="md-nav__link">
+    Deprecation list when GA
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1007,6 +1014,13 @@
         <li class="md-nav__item">
   <a href="#feature-flags-vs-parameters-vs-env-vars" class="md-nav__link">
     Feature flags vs Parameters vs env vars
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecation-list-when-ga" class="md-nav__link">
+    Deprecation list when GA
   </a>
   
 </li>
@@ -1624,7 +1638,7 @@
                 <span class="nt">&quot;when_match&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
                 <span class="nt">&quot;conditions&quot;</span><span class="p">:</span> <span class="p">[</span>
                     <span class="p">{</span>
-<span class="hll">                        <span class="nt">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;IN&quot;</span><span class="p">,</span>
+<span class="hll">                        <span class="nt">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;KEY_IN_VALUE&quot;</span><span class="p">,</span>
 </span><span class="hll">                        <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudFront-Viewer-Country&quot;</span><span class="p">,</span>
 </span><span class="hll">                        <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;NL&quot;</span><span class="p">,</span> <span class="s2">&quot;IE&quot;</span><span class="p">,</span> <span class="s2">&quot;UK&quot;</span><span class="p">,</span> <span class="s2">&quot;PL&quot;</span><span class="p">,</span> <span class="s2">&quot;PT&quot;</span><span class="p">]</span>
 </span>                    <span class="p">}</span>
@@ -1729,8 +1743,48 @@
 </td></tr></table>
 </div>
 </div>
-<p>The <code>action</code> configuration can have 5 different values: <code>EQUALS</code>, <code>STARTSWITH</code>, <code>ENDSWITH</code>, <code>IN</code>, <code>NOT_IN</code>.</p>
-<p>The <code>key</code> and <code>value</code> will be compared to the input from the context parameter.</p>
+<p>The <code>action</code> configuration can have the following values, where the expressions <strong><code>a</code></strong> is the <code>key</code> and <strong><code>b</code></strong> is the <code>value</code> above:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Equivalent expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>EQUALS</strong></td>
+<td><code>lambda a, b: a == b</code></td>
+</tr>
+<tr>
+<td><strong>STARTSWITH</strong></td>
+<td><code>lambda a, b: a.startswith(b)</code></td>
+</tr>
+<tr>
+<td><strong>ENDSWITH</strong></td>
+<td><code>lambda a, b: a.endswith(b)</code></td>
+</tr>
+<tr>
+<td><strong>KEY_IN_VALUE</strong></td>
+<td><code>lambda a, b: a in b</code></td>
+</tr>
+<tr>
+<td><strong>KEY_NOT_IN_VALUE</strong></td>
+<td><code>lambda a, b: a not in b</code></td>
+</tr>
+<tr>
+<td><strong>VALUE_IN_KEY</strong></td>
+<td><code>lambda a, b: b in a</code></td>
+</tr>
+<tr>
+<td><strong>VALUE_NOT_IN_KEY</strong></td>
+<td><code>lambda a, b: b not in a</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">The <code>**key**</code> and <code>**value**</code> will be compared to the input from the <code>**context**</code> parameter.</p>
+</div>
 <p><strong>For multiple conditions</strong>, we will evaluate the list of conditions as a logical <code>AND</code>, so all conditions needs to match to return <code>when_match</code> value.</p>
 <h4 id="rule-engine-flowchart">Rule engine flowchart<a class="headerlink" href="#rule-engine-flowchart" title="Permanent link">&para;</a></h4>
 <p>Now that you've seen all properties of a feature flag schema, this flowchart describes how the rule engines makes a decision on when to return <code>True</code> or <code>False</code>.</p>
@@ -2114,6 +2168,25 @@ app_config = AppConfigStore(
 <td>Rule engine to define when one or multiple features should be enabled depending on the input.</td>
 <td>No</td>
 <td>AppConfig</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deprecation-list-when-ga">Deprecation list when GA<a class="headerlink" href="#deprecation-list-when-ga" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Breaking change</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IN</code> RuleAction</td>
+<td>Use <code>KEY_IN_VALUE</code> instead</td>
+</tr>
+<tr>
+<td><code>NOT_IN</code> RuleAction</td>
+<td>Use <code>KEY_NOT_IN_VALUE</code> instead</td>
 </tr>
 </tbody>
 </table>
