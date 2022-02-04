@@ -2300,8 +2300,8 @@
 <h2 id="testing-your-code">Testing your code<a class="headerlink" href="#testing-your-code" title="Permanent link">&para;</a></h2>
 <p>You can test your resolvers by passing a mocked or actual AppSync Lambda event that you're expecting.</p>
 <p>You can use either <code>app.resolve(event, context)</code> or simply <code>app(event, context)</code>.</p>
-<p>Here's an example from our internal functional test.</p>
-<div class="tabbed-set" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><label for="__tabbed_8_1">test_direct_resolver.py</label><div class="tabbed-content">
+<p>Here's an example of how you can test your synchronous resolvers:</p>
+<div class="tabbed-set" data-tabs="8:3"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><label for="__tabbed_8_1">test_resolver.py</label><div class="tabbed-content">
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -2317,26 +2317,256 @@
 <span class="normal">13</span>
 <span class="normal">14</span>
 <span class="normal">15</span>
-<span class="normal">16</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">test_direct_resolver</span><span class="p">():</span>
-  <span class="c1"># Check whether we can handle an example appsync direct resolver</span>
-  <span class="c1"># load_event primarily deserialize the JSON event into a dict</span>
-  <span class="n">mock_event</span> <span class="o">=</span> <span class="n">load_event</span><span class="p">(</span><span class="s2">&quot;appSyncDirectResolver.json&quot;</span><span class="p">)</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-  <span class="n">app</span> <span class="o">=</span> <span class="n">AppSyncResolver</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">src.index</span> <span class="kn">import</span> <span class="n">app</span>  <span class="c1"># import the instance of AppSyncResolver from your code</span>
 
-  <span class="nd">@app</span><span class="o">.</span><span class="n">resolver</span><span class="p">(</span><span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;createSomething&quot;</span><span class="p">)</span>
-  <span class="k">def</span> <span class="nf">create_something</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-      <span class="k">assert</span> <span class="n">app</span><span class="o">.</span><span class="n">lambda_context</span> <span class="o">==</span> <span class="p">{}</span>
-      <span class="k">return</span> <span class="nb">id</span>
+<span class="k">def</span> <span class="nf">test_direct_resolver</span><span class="p">():</span>
+  <span class="c1"># Load mock event from a file</span>
+  <span class="n">json_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;appSyncDirectResolver.json&quot;</span><span class="p">)</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+    <span class="n">mock_event</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
 
   <span class="c1"># Call the implicit handler</span>
   <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="p">(</span><span class="n">mock_event</span><span class="p">,</span> <span class="p">{})</span>
 
-  <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;my identifier&quot;</span>
+  <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;created this value&quot;</span>
 </code></pre></div>
 </td></tr></table>
 </div>
-<input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><label for="__tabbed_8_2">appSyncDirectResolver.json</label><div class="tabbed-content">
+<input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><label for="__tabbed_8_2">src/index.py</label><div class="tabbed-content">
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools.event_handler</span> <span class="kn">import</span> <span class="n">AppSyncResolver</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">AppSyncResolver</span><span class="p">()</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">resolver</span><span class="p">(</span><span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;createSomething&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">create_something</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;created this value&quot;</span>
+</code></pre></div>
+</td></tr></table>
+</div>
+<input id="__tabbed_8_3" name="__tabbed_8" type="radio" /><label for="__tabbed_8_3">appSyncDirectResolver.json</label><div class="tabbed-content">
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;my identifier&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;identity&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;claims&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;sub&quot;</span><span class="p">:</span> <span class="s2">&quot;192879fc-a240-4bf1-ab5a-d6a00f3063f9&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;email_verified&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nt">&quot;iss&quot;</span><span class="p">:</span> <span class="s2">&quot;https://cognito-idp.us-west-2.amazonaws.com/us-west-xxxxxxxxxxx&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;phone_number_verified&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="nt">&quot;cognito:username&quot;</span><span class="p">:</span> <span class="s2">&quot;jdoe&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;aud&quot;</span><span class="p">:</span> <span class="s2">&quot;7471s60os7h0uu77i1tk27sp9n&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;event_id&quot;</span><span class="p">:</span> <span class="s2">&quot;bc334ed8-a938-4474-b644-9547e304e606&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;token_use&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;auth_time&quot;</span><span class="p">:</span> <span class="mi">1599154213</span><span class="p">,</span>
+      <span class="nt">&quot;phone_number&quot;</span><span class="p">:</span> <span class="s2">&quot;+19999999999&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;exp&quot;</span><span class="p">:</span> <span class="mi">1599157813</span><span class="p">,</span>
+      <span class="nt">&quot;iat&quot;</span><span class="p">:</span> <span class="mi">1599154213</span><span class="p">,</span>
+      <span class="nt">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;jdoe@email.com&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;defaultAuthStrategy&quot;</span><span class="p">:</span> <span class="s2">&quot;ALLOW&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;groups&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="nt">&quot;issuer&quot;</span><span class="p">:</span> <span class="s2">&quot;https://cognito-idp.us-west-2.amazonaws.com/us-west-xxxxxxxxxxx&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sourceIp&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;1.1.1.1&quot;</span>
+    <span class="p">],</span>
+    <span class="nt">&quot;sub&quot;</span><span class="p">:</span> <span class="s2">&quot;192879fc-a240-4bf1-ab5a-d6a00f3063f9&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;jdoe&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;source&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="nt">&quot;request&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;x-forwarded-for&quot;</span><span class="p">:</span> <span class="s2">&quot;1.1.1.1, 2.2.2.2&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloudfront-viewer-country&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloudfront-is-tablet-viewer&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;via&quot;</span><span class="p">:</span> <span class="s2">&quot;2.0 xxxxxxxxxxxxxxxx.cloudfront.net (CloudFront)&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloudfront-forwarded-proto&quot;</span><span class="p">:</span> <span class="s2">&quot;https&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;https://us-west-1.console.aws.amazon.com&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;content-length&quot;</span><span class="p">:</span> <span class="s2">&quot;217&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;accept-language&quot;</span><span class="p">:</span> <span class="s2">&quot;en-US,en;q=0.9&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxxxxxxxxxxxxxx.appsync-api.us-west-1.amazonaws.com&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;x-forwarded-proto&quot;</span><span class="p">:</span> <span class="s2">&quot;https&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;user-agent&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;accept&quot;</span><span class="p">:</span> <span class="s2">&quot;*/*&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloudfront-is-mobile-viewer&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloudfront-is-smarttv-viewer&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;accept-encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;gzip, deflate, br&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;referer&quot;</span><span class="p">:</span> <span class="s2">&quot;https://us-west-1.console.aws.amazon.com/appsync/home?region=us-west-1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;sec-fetch-mode&quot;</span><span class="p">:</span> <span class="s2">&quot;cors&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;x-amz-cf-id&quot;</span><span class="p">:</span> <span class="s2">&quot;3aykhqlUwQeANU-HGY7E_guV5EkNeMMtwyOgiA==&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;x-amzn-trace-id&quot;</span><span class="p">:</span> <span class="s2">&quot;Root=1-5f512f51-fac632066c5e848ae714&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;eyJraWQiOiJScWFCSlJqYVJlM0hrSnBTUFpIcVRXazNOW...&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;sec-fetch-dest&quot;</span><span class="p">:</span> <span class="s2">&quot;empty&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;x-amz-user-agent&quot;</span><span class="p">:</span> <span class="s2">&quot;AWS-Console-AppSync/&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloudfront-is-desktop-viewer&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;sec-fetch-site&quot;</span><span class="p">:</span> <span class="s2">&quot;cross-site&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;x-forwarded-port&quot;</span><span class="p">:</span> <span class="s2">&quot;443&quot;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;prev&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="nt">&quot;info&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;selectionSetList&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;field1&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;field2&quot;</span>
+    <span class="p">],</span>
+    <span class="nt">&quot;selectionSetGraphQL&quot;</span><span class="p">:</span> <span class="s2">&quot;{\n  id\n  field1\n  field2\n}&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;parentTypeName&quot;</span><span class="p">:</span> <span class="s2">&quot;Mutation&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;fieldName&quot;</span><span class="p">:</span> <span class="s2">&quot;createSomething&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{}</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;stash&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+</div>
+</div>
+<p>And an example for testing asynchronous resolvers. Note that this requires the <code>pytest-asyncio</code> package:</p>
+<div class="tabbed-set" data-tabs="9:3"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><label for="__tabbed_9_1">test_async_resolver.py</label><div class="tabbed-content">
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">src.index</span> <span class="kn">import</span> <span class="n">app</span>  <span class="c1"># import the instance of AppSyncResolver from your code</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">test_direct_resolver</span><span class="p">():</span>
+  <span class="c1"># Load mock event from a file</span>
+  <span class="n">json_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;appSyncDirectResolver.json&quot;</span><span class="p">)</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+    <span class="n">mock_event</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+
+  <span class="c1"># Call the implicit handler</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">app</span><span class="p">(</span><span class="n">mock_event</span><span class="p">,</span> <span class="p">{})</span>
+
+  <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;created this value&quot;</span>
+</code></pre></div>
+</td></tr></table>
+</div>
+<input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><label for="__tabbed_9_2">src/index.py</label><div class="tabbed-content">
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.event_handler</span> <span class="kn">import</span> <span class="n">AppSyncResolver</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">AppSyncResolver</span><span class="p">()</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">resolver</span><span class="p">(</span><span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;createSomething&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">create_something_async</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Do async stuff</span>
+    <span class="k">return</span> <span class="s2">&quot;created this value&quot;</span>
+</code></pre></div>
+</td></tr></table>
+</div>
+<input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><label for="__tabbed_9_3">appSyncDirectResolver.json</label><div class="tabbed-content">
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -2496,7 +2726,7 @@
 <div class="md-source-date">
   <small>
     
-      Last update: 2022-01-17
+      Last update: 2022-02-04
     
   </small>
 </div>
