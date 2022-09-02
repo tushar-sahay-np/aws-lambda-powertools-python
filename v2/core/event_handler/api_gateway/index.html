@@ -3091,7 +3091,8 @@ Some event sources require headers and cookies to be encoded as <code>multiValue
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
-<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">http</span> <span class="kn">import</span> <span class="n">HTTPStatus</span>
+<span class="normal">37</span>
+<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">http</span> <span class="kn">import</span> <span class="n">HTTPStatus</span>
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -3099,6 +3100,7 @@ Some event sources require headers and cookies to be encoded as <code>multiValue
 <span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">Tracer</span>
 <span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.event_handler</span> <span class="kn">import</span> <span class="n">APIGatewayRestResolver</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">content_types</span>
 </span><span class="kn">from</span> <span class="nn">aws_lambda_powertools.logging</span> <span class="kn">import</span> <span class="n">correlation_paths</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.shared.cookies</span> <span class="kn">import</span> <span class="n">Cookie</span>
 <span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
 
 <span class="n">tracer</span> <span class="o">=</span> <span class="n">Tracer</span><span class="p">()</span>
@@ -3119,7 +3121,7 @@ Some event sources require headers and cookies to be encoded as <code>multiValue
 </span><span class="hll">        <span class="n">content_type</span><span class="o">=</span><span class="n">content_types</span><span class="o">.</span><span class="n">APPLICATION_JSON</span><span class="p">,</span>
 </span><span class="hll">        <span class="n">body</span><span class="o">=</span><span class="n">todos</span><span class="o">.</span><span class="n">json</span><span class="p">()[:</span><span class="mi">10</span><span class="p">],</span>
 </span><span class="hll">        <span class="n">headers</span><span class="o">=</span><span class="n">custom_headers</span><span class="p">,</span>
-</span><span class="hll">        <span class="n">cookies</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;cookie-name&gt;=&lt;cookie-value&gt;; Secure; Expires=&lt;date&gt;&quot;</span><span class="p">],</span>
+</span><span class="hll">        <span class="n">cookies</span><span class="o">=</span><span class="p">[</span><span class="n">Cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;12345&quot;</span><span class="p">)],</span>
 </span>    <span class="p">)</span>
 
 
@@ -3145,7 +3147,7 @@ Some event sources require headers and cookies to be encoded as <code>multiValue
 <span class="w">    </span><span class="nt">&quot;multiValueHeaders&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">        </span><span class="nt">&quot;Content-Type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;application/json&quot;</span><span class="p">],</span><span class="w"></span>
 <span class="w">        </span><span class="nt">&quot;X-Transaction-Id&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;3490eea9-791b-47a0-91a4-326317db61a9&quot;</span><span class="p">],</span><span class="w"></span>
-<span class="w">        </span><span class="nt">&quot;Set-Cookie&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;&lt;cookie-name&gt;=&lt;cookie-value&gt;; Secure; Expires=&lt;date&gt;&quot;</span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;Set-Cookie&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;session_id=12345; Secure&quot;</span><span class="p">]</span><span class="w"></span>
 <span class="w">    </span><span class="p">},</span><span class="w"></span>
 <span class="w">    </span><span class="nt">&quot;body&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{\&quot;todos\&quot;:[{\&quot;userId\&quot;:1,\&quot;id\&quot;:1,\&quot;title\&quot;:\&quot;delectus aut autem\&quot;,\&quot;completed\&quot;:false},{\&quot;userId\&quot;:1,\&quot;id\&quot;:2,\&quot;title\&quot;:\&quot;quis ut nam facilis et officia qui\&quot;,\&quot;completed\&quot;:false},{\&quot;userId\&quot;:1,\&quot;id\&quot;:3,\&quot;title\&quot;:\&quot;fugiat veniam minus\&quot;,\&quot;completed\&quot;:false},{\&quot;userId\&quot;:1,\&quot;id\&quot;:4,\&quot;title\&quot;:\&quot;et porro tempora\&quot;,\&quot;completed\&quot;:true},{\&quot;userId\&quot;:1,\&quot;id\&quot;:5,\&quot;title\&quot;:\&quot;laboriosam mollitia et enim quasi adipisci quia provident illum\&quot;,\&quot;completed\&quot;:false},{\&quot;userId\&quot;:1,\&quot;id\&quot;:6,\&quot;title\&quot;:\&quot;qui ullam ratione quibusdam voluptatem quia omnis\&quot;,\&quot;completed\&quot;:false},{\&quot;userId\&quot;:1,\&quot;id\&quot;:7,\&quot;title\&quot;:\&quot;illo expedita consequatur quia in\&quot;,\&quot;completed\&quot;:false},{\&quot;userId\&quot;:1,\&quot;id\&quot;:8,\&quot;title\&quot;:\&quot;quo adipisci enim quam ut ab\&quot;,\&quot;completed\&quot;:true},{\&quot;userId\&quot;:1,\&quot;id\&quot;:9,\&quot;title\&quot;:\&quot;molestiae perspiciatis ipsa\&quot;,\&quot;completed\&quot;:false},{\&quot;userId\&quot;:1,\&quot;id\&quot;:10,\&quot;title\&quot;:\&quot;illo est ratione doloremque quia maiores aut\&quot;,\&quot;completed\&quot;:true}]}&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">    </span><span class="nt">&quot;isBase64Encoded&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"></span>
@@ -4049,7 +4051,7 @@ it made it impossible for static checkers like Mypy and IDEs IntelliSense to kno
   <small>
     
       Last update:
-      2022-08-29
+      2022-09-02
     
   </small>
 </div>

@@ -916,7 +916,7 @@ Changes at a glance:</p>
     <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
         <span class="c1"># ...</span>
 <span class="hll">        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;text/plain&quot;</span><span class="p">]},</span>
-</span><span class="hll">        <span class="n">cookies</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CookieName=CookieValue&quot;</span><span class="p">]</span>
+</span><span class="hll">        <span class="n">cookies</span><span class="o">=</span><span class="p">[</span><span class="n">Cookie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;12345&quot;</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">http_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)],</span>
 </span>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="legacy-sqs-batch-processor">Legacy SQS Batch Processor<a class="headerlink" href="#legacy-sqs-batch-processor" title="Permanent link">&para;</a></h2>
@@ -1058,7 +1058,7 @@ You can migrate to the <a href="https://aws.amazon.com/about-aws/whats-new/2021/
   <small>
     
       Last update:
-      2022-09-01
+      2022-09-02
     
   </small>
 </div>
