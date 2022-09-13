@@ -13,7 +13,7 @@
       
       
       <link rel="icon" href="../media/aws-logo-light.svg">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.3">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.4">
     
     
       
@@ -307,6 +307,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#v1290-2022-09-13" class="md-nav__link">
+    v1.29.0 - 2022-09-13
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#bug-fixes" class="md-nav__link">
@@ -2685,28 +2692,13 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../upgrade/" class="md-nav__link">
-        Upgrade guide
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
     
       
     
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" checked>
       
       
       
@@ -2721,13 +2713,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_7">
+        <label class="md-nav__link" for="__nav_6">
           Core utilities
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Core utilities" data-md-level="1">
-        <label class="md-nav__title" for="__nav_7">
+        <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Core utilities
         </label>
@@ -2784,7 +2776,7 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_7_4" type="checkbox" id="__nav_7_4" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_6_4" type="checkbox" id="__nav_6_4" checked>
       
       
       
@@ -2795,13 +2787,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_7_4">
+        <label class="md-nav__link" for="__nav_6_4">
           Event Handler
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Event Handler" data-md-level="2">
-        <label class="md-nav__title" for="__nav_7_4">
+        <label class="md-nav__title" for="__nav_6_4">
           <span class="md-nav__icon md-icon"></span>
           Event Handler
         </label>
@@ -2861,7 +2853,7 @@
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" checked>
       
       
       
@@ -2890,13 +2882,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_8">
+        <label class="md-nav__link" for="__nav_7">
           Utilities
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Utilities" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_7">
           <span class="md-nav__icon md-icon"></span>
           Utilities
         </label>
@@ -3087,6 +3079,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#v1290-2022-09-13" class="md-nav__link">
+    v1.29.0 - 2022-09-13
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#bug-fixes" class="md-nav__link">
@@ -5431,6 +5430,8 @@
 
 <p><a name="unreleased"></a></p>
 <h1 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h1>
+<p><a name="v1.29.0"></a></p>
+<h2 id="v1290-2022-09-13"><a href="https://github.com/awslabs/aws-lambda-powertools-python/compare/v1.28.0...v1.29.0">v1.29.0</a> - 2022-09-13<a class="headerlink" href="#v1290-2022-09-13" title="Permanent link">&para;</a></h2>
 <h2 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>ci:</strong> pass core fns to large pr workflow script</li>
@@ -5456,39 +5457,46 @@
 <li><strong>event_handler:</strong> add cookies as 1st class citizen in v2 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1487">#1487</a>)</li>
 <li><strong>event_handler:</strong> improved support for headers and cookies in v2 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1455">#1455</a>)</li>
 <li><strong>event_sources:</strong> add CloudWatch dashboard custom widget event (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1474">#1474</a>)</li>
+<li><strong>parser:</strong> add KafkaMskEventModel and KafkaSelfManagedEventModel (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1499">#1499</a>)</li>
 <li><strong>tracer:</strong> support methods with the same name (ABCs) by including fully qualified name in v2 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1486">#1486</a>)</li>
 </ul>
 <h2 id="maintenance">Maintenance<a class="headerlink" href="#maintenance" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>bandit:</strong> update baseline</li>
-<li><strong>ci:</strong> enable ci checks for v2</li>
-<li><strong>ci:</strong> destructure assignment on comment_large_pr</li>
-<li><strong>ci:</strong> add missing description fields</li>
-<li><strong>ci:</strong> fix invalid dependency leftover</li>
-<li><strong>ci:</strong> remove dangling debug step</li>
-<li><strong>ci:</strong> limit E2E workflow run for source code change</li>
-<li><strong>ci:</strong> add note for state persistence on comment_large_pr</li>
-<li><strong>ci:</strong> add linter for GitHub Actions as pre-commit hook (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1479">#1479</a>)</li>
-<li><strong>ci:</strong> remove unused and undeclared OS matrix env</li>
-<li><strong>ci:</strong> sync package version with pypi</li>
-<li><strong>ci:</strong> add workflow to suggest splitting large PRs (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1480">#1480</a>)</li>
-<li><strong>ci:</strong> create adhoc docs workflow for v2</li>
 <li><strong>ci:</strong> create adhoc docs workflow for v2</li>
 <li><strong>ci:</strong> create docs workflow for v2</li>
+<li><strong>ci:</strong> create adhoc docs workflow for v2</li>
+<li><strong>ci:</strong> limit E2E workflow run for source code change</li>
+<li><strong>ci:</strong> remove unused and undeclared OS matrix env</li>
+<li><strong>ci:</strong> add missing description fields</li>
+<li><strong>ci:</strong> fix invalid dependency leftover</li>
 <li><strong>ci:</strong> create reusable docs publishing workflow (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1482">#1482</a>)</li>
-<li><strong>ci:</strong> format comment  on comment_large_pr script</li>
+<li><strong>ci:</strong> remove dangling debug step</li>
+<li><strong>ci:</strong> add linter for GitHub Actions as pre-commit hook (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1479">#1479</a>)</li>
+<li><strong>ci:</strong> add workflow to suggest splitting large PRs (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1480">#1480</a>)</li>
+<li><strong>ci:</strong> enable ci checks for v2</li>
+<li><strong>ci:</strong> destructure assignment on comment_large_pr</li>
 <li><strong>ci:</strong> record pr details upon labeling</li>
+<li><strong>ci:</strong> sync package version with pypi</li>
+<li><strong>ci:</strong> add note for state persistence on comment_large_pr</li>
+<li><strong>ci:</strong> format comment  on comment_large_pr script</li>
 <li><strong>deps:</strong> bump pydantic from 1.10.0 to 1.10.1 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1491">#1491</a>)</li>
 <li><strong>deps:</strong> bump pydantic from 1.10.1 to 1.10.2 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1502">#1502</a>)</li>
-<li><strong>deps-dev:</strong> bump aws-cdk-aws-apigatewayv2-integrations-alpha from 2.39.1a0 to 2.40.0a0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1496">#1496</a>)</li>
-<li><strong>deps-dev:</strong> bump mypy-boto3-dynamodb from 1.24.55.post1 to 1.24.60 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1481">#1481</a>)</li>
-<li><strong>deps-dev:</strong> bump mypy-boto3-dynamodb from 1.24.55.post1 to 1.24.60 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/306">#306</a>)</li>
+<li><strong>deps:</strong> bump aws-cdk-aws-apigatewayv2-integrations-alpha from 2.40.0a0 to 2.41.0a0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1510">#1510</a>)</li>
+<li><strong>deps:</strong> bump types-requests from 2.28.9 to 2.28.10 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1508">#1508</a>)</li>
+<li><strong>deps:</strong> bump mkdocs-material from 8.4.3 to 8.4.4 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1513">#1513</a>)</li>
+<li><strong>deps:</strong> bump flake8-bugbear from 22.8.23 to 22.9.11 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1512">#1512</a>)</li>
 <li><strong>deps-dev:</strong> bump mkdocs-material from 8.4.1 to 8.4.2 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1483">#1483</a>)</li>
 <li><strong>deps-dev:</strong> bump flake8-variables-names from 0.0.4 to 0.0.5 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1490">#1490</a>)</li>
+<li><strong>deps-dev:</strong> bump mypy-boto3-dynamodb from 1.24.55.post1 to 1.24.60 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/306">#306</a>)</li>
+<li><strong>deps-dev:</strong> bump mypy-boto3-dynamodb from 1.24.55.post1 to 1.24.60 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1481">#1481</a>)</li>
+<li><strong>deps-dev:</strong> bump mypy-boto3-ssm from 1.24.39.post2 to 1.24.69 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1509">#1509</a>)</li>
 <li><strong>deps-dev:</strong> bump aws-cdk-lib from 2.39.1 to 2.40.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1495">#1495</a>)</li>
 <li><strong>deps-dev:</strong> bump black from 22.6.0 to 22.8.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1494">#1494</a>)</li>
 <li><strong>deps-dev:</strong> bump pytest from 7.1.2 to 7.1.3 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1497">#1497</a>)</li>
 <li><strong>deps-dev:</strong> bump mkdocs-material from 8.4.2 to 8.4.3 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1504">#1504</a>)</li>
+<li><strong>deps-dev:</strong> bump aws-cdk-aws-apigatewayv2-integrations-alpha from 2.39.1a0 to 2.40.0a0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1496">#1496</a>)</li>
+<li><strong>deps-dev:</strong> bump aws-cdk-lib from 2.40.0 to 2.41.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1507">#1507</a>)</li>
 <li><strong>maintainers:</strong> update release workflow link</li>
 <li><strong>maintenance:</strong> add discord link to first PR and first issue (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1493">#1493</a>)</li>
 </ul>
@@ -7690,6 +7698,7 @@
     
   </small>
 </div>
+
 
 
 
