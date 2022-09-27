@@ -1468,7 +1468,7 @@ with <a href="https://pydantic-docs.helpmanual.io/usage/types/#json-type">Pydant
 
 
 <span class="k">class</span> <span class="nc">CancelOrderModel</span><span class="p">(</span><span class="n">APIGatewayProxyEventV2Model</span><span class="p">):</span>
-<span class="hll">    <span class="n">body</span><span class="p">:</span> <span class="n">Json</span><span class="p">[</span><span class="n">CancelOrder</span><span class="p">]</span>  <span class="c1"># type: ignore[assignment]</span>
+<span class="hll">    <span class="n">body</span><span class="p">:</span> <span class="n">Json</span><span class="p">[</span><span class="n">CancelOrder</span><span class="p">]</span>  <span class="c1"># type: ignore[type-arg]</span>
 </span>
 
 <span class="nd">@event_parser</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">CancelOrderModel</span><span class="p">)</span>
