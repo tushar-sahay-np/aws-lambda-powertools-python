@@ -1043,15 +1043,21 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">extract_data_from_builtin_envelope.py</label><label for="__tabbed_2_2">extract_data_from_builtin_envelope.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span>
-<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.jmespath_utils</span> <span class="kn">import</span> <span class="n">envelopes</span><span class="p">,</span> <span class="n">extract_data_from_envelope</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.jmespath_utils</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span class="hll">    <span class="n">envelopes</span><span class="p">,</span>
+</span><span class="hll">    <span class="n">extract_data_from_envelope</span><span class="p">,</span>
+</span><span class="hll"><span class="p">)</span>
 </span><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
 
 
@@ -1422,12 +1428,20 @@
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
-<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.idempotency</span> <span class="kn">import</span> <span class="n">DynamoDBPersistenceLayer</span><span class="p">,</span> <span class="n">IdempotencyConfig</span><span class="p">,</span> <span class="n">idempotent</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.idempotency</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DynamoDBPersistenceLayer</span><span class="p">,</span>
+    <span class="n">IdempotencyConfig</span><span class="p">,</span>
+    <span class="n">idempotent</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">persistence_layer</span> <span class="o">=</span> <span class="n">DynamoDBPersistenceLayer</span><span class="p">(</span><span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;IdempotencyTable&quot;</span><span class="p">)</span>
 
@@ -2008,15 +2022,21 @@
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
-<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">base64</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">binascii</span>
 
 <span class="kn">import</span> <span class="nn">snappy</span>
 <span class="kn">from</span> <span class="nn">jmespath.exceptions</span> <span class="kn">import</span> <span class="n">JMESPathTypeError</span>
 <span class="kn">from</span> <span class="nn">jmespath.functions</span> <span class="kn">import</span> <span class="n">signature</span>
 
-<span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.jmespath_utils</span> <span class="kn">import</span> <span class="n">PowertoolsFunctions</span><span class="p">,</span> <span class="n">extract_data_from_envelope</span>
-</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.jmespath_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="hll">    <span class="n">PowertoolsFunctions</span><span class="p">,</span>
+</span>    <span class="n">extract_data_from_envelope</span><span class="p">,</span>
+<span class="p">)</span>
+
 
 <span class="hll"><span class="k">class</span> <span class="nc">CustomFunctions</span><span class="p">(</span><span class="n">PowertoolsFunctions</span><span class="p">):</span>
 </span>    <span class="c1"># only decode if value is a string</span>
@@ -2093,7 +2113,7 @@
   <small>
     
       Last update:
-      2022-08-19
+      2022-10-05
     
   </small>
 </div>
