@@ -3335,6 +3335,10 @@ for the given name and level to the logging module. By default, this logs all bo
 </code></pre></div></td></tr></table></div>
 <h3 id="how-can-i-enable-powertools-logging-for-imported-libraries">How can I enable Powertools logging for imported libraries?<a class="headerlink" href="#how-can-i-enable-powertools-logging-for-imported-libraries" title="Permanent link">&para;</a></h3>
 <p>You can copy the Logger setup to all or sub-sets of registered external loggers. Use the <code>copy_config_to_registered_logger</code> method to do this.</p>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>To help differentiate between loggers, we include the standard logger <code>name</code> attribute for all loggers we copied configuration to.</p>
+</details>
 <p>By default all registered loggers will be modified. You can change this behavior by providing <code>include</code> and <code>exclude</code> attributes. You can also provide optional <code>log_level</code> attribute external loggers will be configured with.</p>
 <div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Cloning Logger config to all other registered standard loggers</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
@@ -3552,7 +3556,7 @@ for the given name and level to the logging module. By default, this logs all bo
   <small>
     
       Last update:
-      2022-10-03
+      2022-10-05
     
   </small>
 </div>
