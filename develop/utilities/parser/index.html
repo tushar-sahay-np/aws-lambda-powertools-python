@@ -1293,6 +1293,10 @@ installed without binary files</a>:</p>
 <td>Lambda Event Source payload for Amazon Kinesis Data Streams</td>
 </tr>
 <tr>
+<td><strong>KinesisFirehoseModel</strong></td>
+<td>Lambda Event Source payload for Amazon Kinesis Firehose</td>
+</tr>
+<tr>
 <td><strong>SesModel</strong></td>
 <td>Lambda Event Source payload for Amazon Simple Email Service</td>
 </tr>
@@ -1650,6 +1654,11 @@ with <a href="https://pydantic-docs.helpmanual.io/usage/types/#json-type">Pydant
 <tr>
 <td><strong>KinesisDataStreamEnvelope</strong></td>
 <td>1. Parses data using <code>KinesisDataStreamModel</code> which will base64 decode it. <br/> 2. Parses records in in <code>Records</code> key using your model and returns them in a list.</td>
+<td><code>List[Model]</code></td>
+</tr>
+<tr>
+<td><strong>KinesisFirehoseEnvelope</strong></td>
+<td>1. Parses data using <code>KinesisFirehoseModel</code> which will base64 decode it. <br/> 2. Parses records in in <code>Records</code> key using your model and returns them in a list.</td>
 <td><code>List[Model]</code></td>
 </tr>
 <tr>
@@ -2072,7 +2081,7 @@ with <a href="https://pydantic-docs.helpmanual.io/usage/types/#json-type">Pydant
   <small>
     
       Last update:
-      2022-09-23
+      2022-10-10
     
   </small>
 </div>
