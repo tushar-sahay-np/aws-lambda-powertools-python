@@ -5761,16 +5761,17 @@
 <li>lock dependencies</li>
 <li>lint files</li>
 <li>mypy errors</li>
+<li><strong>ci:</strong> sed in-place syntax for GNU/Linux; improve debugging</li>
+<li><strong>ci:</strong> layer artifact path</li>
+<li><strong>ci:</strong> fix artifact path</li>
+<li><strong>ci:</strong> typo</li>
+<li><strong>ci:</strong> SAR tagging schema</li>
+<li><strong>ci:</strong> temporarly remove pypi test deployment</li>
+<li><strong>ci:</strong> secret and OIDC inheritance in nested children workflow</li>
+<li><strong>ci:</strong> force fail if layer artifact cannot be uploaded</li>
+<li><strong>ci:</strong> [artifact-debug] shift artifact upload up</li>
+<li><strong>ci:</strong> [artifact-debug] upload-artefact ignores working-directory</li>
 <li><strong>ci:</strong> workflow should use npx for CDK CLI</li>
-<li><strong>ci:</strong> workflow permissions and typos</li>
-<li><strong>ci:</strong> version propagation</li>
-<li><strong>ci:</strong> fixing permissions</li>
-<li><strong>ci:</strong> workflow permissions</li>
-<li><strong>ci:</strong> fix workflow permissions</li>
-<li><strong>ci:</strong> workflow permissions</li>
-<li><strong>ci:</strong> fix workflow permissions</li>
-<li><strong>ci:</strong> remove cdk permission override</li>
-<li><strong>docs:</strong> fix v2 layer arn</li>
 </ul>
 <h2 id="code-refactoring">Code Refactoring<a class="headerlink" href="#code-refactoring" title="Permanent link">&para;</a></h2>
 <ul>
@@ -5803,35 +5804,20 @@
 <h2 id="maintenance">Maintenance<a class="headerlink" href="#maintenance" title="Permanent link">&para;</a></h2>
 <ul>
 <li>bump pyproject version to 2.0</li>
+<li>update v2 layer ARN on documentation</li>
 <li>merge v2 branch</li>
-<li><strong>ci:</strong> debug creds one level up and with CLI</li>
-<li><strong>ci:</strong> [debug creds] test multiple oidp requests</li>
-<li><strong>ci:</strong> [debug creds] test disable secret inheritance</li>
-<li><strong>ci:</strong> [debug creds] test official creds with region</li>
-<li><strong>ci:</strong> [debug creds] test official creds</li>
-<li><strong>ci:</strong> [debug creds] disable changelog job</li>
-<li><strong>ci:</strong> [debug creds] curl oidc idp</li>
-<li><strong>ci:</strong> debug creds with workspace dir</li>
-<li><strong>ci:</strong> debug creds one level up and with CLI debug level</li>
-<li><strong>ci:</strong> [debug creds] uncomment layer and sar jobs</li>
-<li><strong>ci:</strong> remove creds debug</li>
-<li><strong>ci:</strong> test hypothesis of secret resolution failure</li>
-<li><strong>ci:</strong> debug oidc credentials trading with general secret</li>
-<li><strong>ci:</strong> use latest aws-credentials</li>
-<li><strong>ci:</strong> debug oidc credentials trade</li>
-<li><strong>ci:</strong> remove old SAR pipeline call</li>
-<li><strong>ci:</strong> add option to skip v1 release guard</li>
-<li><strong>ci:</strong> resolve workflow_call depth limit</li>
-<li><strong>ci:</strong> [debug creds] replace pypi pre-release tag to sar semver pre-release tag</li>
+<li><strong>ci:</strong> reinstate test.pypi before public launch</li>
+<li><strong>ci:</strong> clarified pre-release tags</li>
 <li><strong>ci:</strong> migrate E2E tests to CDK CLI and off Docker (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1501">#1501</a>)</li>
 <li><strong>ci:</strong> remove v1 workflows (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1617">#1617</a>)</li>
-<li><strong>ci:</strong> [debug creds] replace pypi pre-release tag to sar semver pre-release tag part2</li>
+<li><strong>ci:</strong> revert reinstate test.pypi before public launch</li>
 <li><strong>core:</strong> expose modules in the Top-level package (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1517">#1517</a>)</li>
 <li><strong>dep:</strong> add cfn-lint as a dev dependency; pre-commit (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1612">#1612</a>)</li>
-<li><strong>deps:</strong> remove email-validator; use Str over EmailStr in SES model (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1608">#1608</a>)</li>
 <li><strong>deps:</strong> bump release-drafter/release-drafter from 5.21.0 to 5.21.1 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1611">#1611</a>)</li>
 <li><strong>deps:</strong> lock importlib to 4.x</li>
+<li><strong>deps:</strong> remove email-validator; use Str over EmailStr in SES model (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1608">#1608</a>)</li>
 <li><strong>deps-dev:</strong> bump mypy-boto3-s3 from 1.24.76 to 1.24.94 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1622">#1622</a>)</li>
+<li><strong>deps-dev:</strong> bump aws-cdk-lib from 2.46.0 to 2.47.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/1629">#1629</a>)</li>
 <li><strong>layer:</strong> bump to 1.31.1 (v39)</li>
 </ul>
 <p><a name="v1.31.1"></a></p>
