@@ -1645,13 +1645,13 @@ General information
 </thead>
 <tbody>
 <tr>
-<td><a href="https://serverlessrepo.aws.amazon.com/applications/eu-west-1/057560766410/aws-lambda-powertools-python-layer-v2">aws-lambda-powertools-python-layer-v2</a></td>
-<td><a class="copyMe" href="#">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2</a><img alt="📋" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f4cb.png" title=":clipboard:" /></td>
+<td><a href="https://serverlessrepo.aws.amazon.com/applications/eu-west-1/057560766410/aws-lambda-powertools-python-layer">aws-lambda-powertools-python-layer</a></td>
+<td><a class="copyMe" href="#">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer</a><img alt="📋" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f4cb.png" title=":clipboard:" /></td>
 <td>Contains all extra dependencies (e.g: pydantic).</td>
 </tr>
 <tr>
-<td><a href="https://serverlessrepo.aws.amazon.com/applications/eu-west-1/057560766410/aws-lambda-powertools-python-layer-v2-arm64">aws-lambda-powertools-python-layer-v2-arm64</a></td>
-<td><a class="copyMe" href="#">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2-arm64</a><img alt="📋" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f4cb.png" title=":clipboard:" /></td>
+<td><a href="https://serverlessrepo.aws.amazon.com/applications/eu-west-1/057560766410/aws-lambda-powertools-python-layer-arm64">aws-lambda-powertools-python-layer-arm64</a></td>
+<td><a class="copyMe" href="#">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-arm64</a><img alt="📋" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f4cb.png" title=":clipboard:" /></td>
 <td>Contains all extra dependencies (e.g: pydantic). For arm64 functions.</td>
 </tr>
 </tbody>
@@ -1680,7 +1680,7 @@ General information
 <span class="w">    </span><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWS::Serverless::Application</span><span class="w"></span>
 <span class="w">    </span><span class="nt">Properties</span><span class="p">:</span><span class="w"></span>
 <span class="w">        </span><span class="nt">Location</span><span class="p">:</span><span class="w"></span>
-<span class="hll"><span class="w">            </span><span class="nt">ApplicationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2</span><span class="w"></span>
+<span class="hll"><span class="w">            </span><span class="nt">ApplicationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer</span><span class="w"></span>
 </span><span class="hll"><span class="w">            </span><span class="nt">SemanticVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0.0</span><span class="w"> </span><span class="c1"># change to latest semantic version available in SAR</span><span class="w"></span>
 </span>
 <span class="nt">MyLambdaFunction</span><span class="p">:</span><span class="w"></span>
@@ -1720,7 +1720,7 @@ General information
 </span><span class="hll"><span class="w">        </span><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWS::Serverless::Application</span><span class="w"></span>
 </span><span class="w">        </span><span class="nt">Properties</span><span class="p">:</span><span class="w"></span>
 <span class="w">            </span><span class="nt">Location</span><span class="p">:</span><span class="w"></span>
-<span class="w">                </span><span class="nt">ApplicationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2</span><span class="w"></span>
+<span class="w">                </span><span class="nt">ApplicationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer</span><span class="w"></span>
 <span class="w">                </span><span class="c1"># Find latest from github.com/awslabs/aws-lambda-powertools-python/releases</span><span class="w"></span>
 <span class="w">                </span><span class="nt">SemanticVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0.0</span><span class="w"></span>
 </code></pre></div></td></tr></table></div>
@@ -1762,7 +1762,7 @@ General information
 <span class="n">POWERTOOLS_BASE_NAME</span> <span class="o">=</span> <span class="s1">&#39;AWSLambdaPowertools&#39;</span>
 <span class="c1"># Find latest from github.com/awslabs/aws-lambda-powertools-python/releases</span>
 <span class="n">POWERTOOLS_VER</span> <span class="o">=</span> <span class="s1">&#39;2.0.0&#39;</span>
-<span class="n">POWERTOOLS_ARN</span> <span class="o">=</span> <span class="s1">&#39;arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2&#39;</span>
+<span class="n">POWERTOOLS_ARN</span> <span class="o">=</span> <span class="s1">&#39;arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer&#39;</span>
 
 <span class="k">class</span> <span class="nc">SampleApp</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Construct</span><span class="p">):</span>
 
@@ -1858,7 +1858,7 @@ General information
 </span><span class="p">}</span><span class="w"></span>
 
 <span class="hll"><span class="kr">data</span><span class="w"> </span><span class="nc">&quot;aws_serverlessapplicationrepository_application&quot;</span><span class="w"> </span><span class="nv">&quot;sar_app&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-</span><span class="hll"><span class="w">  </span><span class="na">application_id</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2&quot;</span><span class="w"></span>
+</span><span class="hll"><span class="w">  </span><span class="na">application_id</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer&quot;</span><span class="w"></span>
 </span><span class="hll"><span class="w">  </span><span class="na">semantic_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">var.aws_powertools_version</span><span class="w"></span>
 </span><span class="p">}</span><span class="w"></span>
 
@@ -1976,7 +1976,7 @@ General information
 </span><span class="hll"><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serverlessrepo:GetCloudFormationTemplate</span><span class="w"></span>
 </span><span class="hll"><span class="w">            </span><span class="nt">Resource</span><span class="p">:</span><span class="w"></span>
 </span><span class="hll"><span class="w">                </span><span class="c1"># this is arn of the powertools SAR app</span><span class="w"></span>
-</span><span class="hll"><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2</span><span class="w"></span>
+</span><span class="hll"><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer</span><span class="w"></span>
 </span><span class="hll"><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Sid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">S3AccessLayer</span><span class="w"></span>
 </span><span class="hll"><span class="w">            </span><span class="nt">Effect</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Allow</span><span class="w"></span>
 </span><span class="hll"><span class="w">            </span><span class="nt">Action</span><span class="p">:</span><span class="w"></span>
@@ -1993,7 +1993,7 @@ General information
 </span><span class="hll"><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lambda:PublishLayerVersion</span><span class="w"></span>
 </span><span class="hll"><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lambda:GetLayerVersion</span><span class="w"></span>
 </span><span class="hll"><span class="w">            </span><span class="nt">Resource</span><span class="p">:</span><span class="w"></span>
-</span><span class="hll"><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="kt">!Sub</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:aws-lambda-powertools-python-layer-v2*</span><span class="w"></span>
+</span><span class="hll"><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="kt">!Sub</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:aws-lambda-powertools-python-layer*</span><span class="w"></span>
 </span><span class="w">        </span><span class="nt">Roles</span><span class="p">:</span><span class="w"></span>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Ref</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;PowertoolsLayerIamRole&quot;</span><span class="w"></span>
 </code></pre></div></td></tr></table></div>
@@ -2004,7 +2004,7 @@ General information
 <p>You can fetch available versions via SAR ListApplicationVersions API:</p>
 <div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">AWS CLI example</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>aws serverlessrepo list-application-versions <span class="se">\</span>
-    --application-id arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer-v2
+    --application-id arn:aws:serverlessrepo:eu-west-1:057560766410:applications/aws-lambda-powertools-python-layer
 </code></pre></div></td></tr></table></div>
 <h2 id="quick-getting-started">Quick getting started<a class="headerlink" href="#quick-getting-started" title="Permanent link">&para;</a></h2>
 <div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Hello world example using SAM CLI</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>sam init --location https://github.com/aws-samples/cookiecutter-aws-sam-python
@@ -2208,7 +2208,7 @@ General information
   <small>
     
       Last update:
-      2022-10-20
+      2022-10-21
     
   </small>
 </div>
