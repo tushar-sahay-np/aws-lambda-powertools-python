@@ -966,12 +966,12 @@
 <ul>
 <li><strong>Lambda Layer (x86_64)</strong>: <a class="copyMe" href="#"><strong>arn:aws:lambda:{region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:11</strong></a><img alt="📋" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f4cb.png" title=":clipboard:" /></li>
 <li><strong>Lambda Layer (arm64)</strong>: <a class="copyMe" href="#"><strong>arn:aws:lambda:{region}:017000801446:layer:AWSLambdaPowertoolsPythonV2-Arm64:11</strong></a><img alt="📋" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f4cb.png" title=":clipboard:" /></li>
-<li><strong>PyPi</strong>: <strong><code>pip install aws-lambda-powertools</code></strong></li>
+<li><strong>PyPi</strong>: <strong><code>pip install "aws-lambda-powertools"</code></strong></li>
 </ul>
 <details class="info" open="open">
 <summary>Some utilities require additional dependencies</summary>
 <p>You can stop reading if you're using Lambda Layer.</p>
-<p><a href="core/tracer/" target="_blank">Tracer</a>, <a href="utilities/validation/" target="_blank">Validation</a> and <a href="utilities/parser/" target="_blank">Parser</a> require additional dependencies. If you prefer to install all of them, use <code>pip install aws-lambda-powertools[all]</code>.</p>
+<p><a href="core/tracer/" target="_blank">Tracer</a>, <a href="utilities/validation/" target="_blank">Validation</a> and <a href="utilities/parser/" target="_blank">Parser</a> require additional dependencies. If you prefer to install all of them, use <code>pip install "aws-lambda-powertools[all]"</code>.</p>
 </details>
 <details class="hint" open="open">
 <summary>Support this project by using Lambda Layers <img alt="❤️" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/2764.png" title=":heart:" /></summary>
@@ -982,8 +982,8 @@
 <p>Powertools relies on the AWS SDK bundled in the Lambda runtime. This helps us achieve an optimal package size and initialization.</p>
 <p>This means you need to add AWS SDK as a development dependency (not as a production dependency).</p>
 <ul>
-<li><strong>Pip</strong>: <code>pip install aws-lambda-powertools[aws-sdk]</code></li>
-<li><strong>Poetry</strong>: <code>poetry add aws-lambda-powertools[aws-sdk] --dev</code></li>
+<li><strong>Pip</strong>: <code>pip install "aws-lambda-powertools[aws-sdk]"</code></li>
+<li><strong>Poetry</strong>: <code>poetry add "aws-lambda-powertools[aws-sdk]" --dev</code></li>
 <li><strong>Pipenv</strong>: <code>pipenv install --dev "aws-lambda-powertools[aws-sdk]"</code></li>
 </ul>
 <details class="note" open="open">
