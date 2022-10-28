@@ -563,6 +563,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#date-formatting" class="md-nav__link">
+    Date formatting
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1214,6 +1221,13 @@
           <li class="md-nav__item">
   <a href="#logging-exceptions" class="md-nav__link">
     Logging exceptions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#date-formatting" class="md-nav__link">
+    Date formatting
   </a>
   
 </li>
@@ -2367,6 +2381,75 @@
 </div>
 </div>
 </div>
+<h3 id="date-formatting">Date formatting<a class="headerlink" href="#date-formatting" title="Permanent link">&para;</a></h3>
+<p>Logger uses Python's standard logging date format with the addition of timezone: <code>2021-05-03 11:47:12,494+0200</code>.</p>
+<p>You can easily change the date format using one of the following parameters:</p>
+<ul>
+<li><strong><code>datefmt</code></strong>. You can pass any <a href="https://strftime.org/" target="_blank">strftime format codes</a>. Use <code>%F</code> if you need milliseconds.</li>
+<li><strong><code>use_rfc3339</code></strong>. This flag will use a format compliant with both RFC3339 and ISO8601: <code>2022-10-27T16:27:43.738+02:00</code></li>
+</ul>
+<details class="tip" open="open">
+<summary>Prefer using <a href="https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes" target="_blank">datetime string formats</a>?</summary>
+<p>Use <code>use_datetime_directive</code> flag along with <code>datefmt</code> to instruct Logger to use <code>datetime</code> instead of <code>time.strftime</code>.</p>
+</details>
+<div class="tabbed-set tabbed-alternate" data-tabs="11:2"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><input id="__tabbed_11_2" name="__tabbed_11" type="radio" /><div class="tabbed-labels"><label for="__tabbed_11_1">date_formatting.py</label><label for="__tabbed_11_2">date_formatting_output.json</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span>
+
+<span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %I:%M:%S %p&quot;</span>
+
+<span class="hll"><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;payment&quot;</span><span class="p">,</span> <span class="n">use_rfc3339</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Collecting payment&quot;</span><span class="p">)</span>
+
+<span class="hll"><span class="n">logger_custom_format</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;loyalty&quot;</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="n">date_format</span><span class="p">)</span>
+</span><span class="n">logger_custom_format</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating points&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;location&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;module&gt;:6&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Collecting payment&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="hll"><span class="w">        </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2022-10-28T14:35:03.210+02:00&quot;</span><span class="p">,</span><span class="w"></span>
+</span><span class="w">        </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;payment&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;location&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;module&gt;:9&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Calculating points&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="hll"><span class="w">        </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;10/28/2022 02:35:03 PM&quot;</span><span class="p">,</span><span class="w"></span>
+</span><span class="w">        </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;loyalty&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
+</code></pre></div></td></tr></table></div>
+</div>
+</div>
+</div>
 <h2 id="advanced">Advanced<a class="headerlink" href="#advanced" title="Permanent link">&para;</a></h2>
 <h3 id="built-in-correlation-id-expressions">Built-in Correlation ID expressions<a class="headerlink" href="#built-in-correlation-id-expressions" title="Permanent link">&para;</a></h3>
 <p>You can use any of the following built-in JMESPath expressions as part of <a href="#setting-a-correlation-id">inject_lambda_context decorator</a>.</p>
@@ -2413,7 +2496,7 @@
 <h3 id="reusing-logger-across-your-code">Reusing Logger across your code<a class="headerlink" href="#reusing-logger-across-your-code" title="Permanent link">&para;</a></h3>
 <p>Similar to <a href="../tracer/#reusing-tracer-across-your-code">Tracer</a>, a new instance that uses the same <code>service</code> name - env var or explicit parameter - will reuse a previous Logger instance. Just like <code>logging.getLogger("logger_name")</code> would in the standard library if called with the same logger name.</p>
 <p>Notice in the CloudWatch Logs output how <code>payment_id</code> appeared as expected when logging in <code>collect.py</code>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="11:3"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><input id="__tabbed_11_2" name="__tabbed_11" type="radio" /><input id="__tabbed_11_3" name="__tabbed_11" type="radio" /><div class="tabbed-labels"><label for="__tabbed_11_1">logger_reuse.py</label><label for="__tabbed_11_2">logger_reuse_payment.py</label><label for="__tabbed_11_3">logger_reuse_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="12:3"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio" /><input id="__tabbed_12_2" name="__tabbed_12" type="radio" /><input id="__tabbed_12_3" name="__tabbed_12" type="radio" /><div class="tabbed-labels"><label for="__tabbed_12_1">logger_reuse.py</label><label for="__tabbed_12_2">logger_reuse_payment.py</label><label for="__tabbed_12_3">logger_reuse_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2510,7 +2593,7 @@
 <summary>Note</summary>
 <p>Open a <a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/new?assignees=&amp;labels=feature-request%2C+triage&amp;template=feature_request.md&amp;title=">feature request</a> if you want Logger to calculate sampling for every invocation</p>
 </details>
-<div class="tabbed-set tabbed-alternate" data-tabs="12:2"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio" /><input id="__tabbed_12_2" name="__tabbed_12" type="radio" /><div class="tabbed-labels"><label for="__tabbed_12_1">sampling_debug_logs.py</label><label for="__tabbed_12_2">sampling_debug_logs_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="13:2"><input checked="checked" id="__tabbed_13_1" name="__tabbed_13" type="radio" /><input id="__tabbed_13_2" name="__tabbed_13" type="radio" /><div class="tabbed-labels"><label for="__tabbed_13_1">sampling_debug_logs.py</label><label for="__tabbed_13_2">sampling_debug_logs_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2692,7 +2775,7 @@
 <summary>Danger</summary>
 <p>A common issue when migrating from other Loggers is that <code>service</code> might be defined in the parent Logger (no child param), and not defined in the child Logger:</p>
 </details>
-<div class="tabbed-set tabbed-alternate" data-tabs="13:2"><input checked="checked" id="__tabbed_13_1" name="__tabbed_13" type="radio" /><input id="__tabbed_13_2" name="__tabbed_13" type="radio" /><div class="tabbed-labels"><label for="__tabbed_13_1">logging_inheritance_bad.py</label><label for="__tabbed_13_2">logging_inheritance_module.py</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="14:2"><input checked="checked" id="__tabbed_14_1" name="__tabbed_14" type="radio" /><input id="__tabbed_14_2" name="__tabbed_14" type="radio" /><div class="tabbed-labels"><label for="__tabbed_14_1">logging_inheritance_bad.py</label><label for="__tabbed_14_2">logging_inheritance_module.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2752,7 +2835,7 @@
 <p>This can be fixed by either ensuring both has the <code>service</code> value as <code>payment</code>, or simply use the environment variable <code>POWERTOOLS_SERVICE_NAME</code> to ensure service value will be the same across all Loggers when not explicitly set.</p>
 </details>
 <p>Do this instead:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="14:2"><input checked="checked" id="__tabbed_14_1" name="__tabbed_14" type="radio" /><input id="__tabbed_14_2" name="__tabbed_14" type="radio" /><div class="tabbed-labels"><label for="__tabbed_14_1">logging_inheritance_good.py</label><label for="__tabbed_14_2">logging_inheritance_module.py</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="15:2"><input checked="checked" id="__tabbed_15_1" name="__tabbed_15" type="radio" /><input id="__tabbed_15_2" name="__tabbed_15" type="radio" /><div class="tabbed-labels"><label for="__tabbed_15_1">logging_inheritance_good.py</label><label for="__tabbed_15_2">logging_inheritance_module.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2807,14 +2890,9 @@
 </div>
 </div>
 <h4 id="overriding-log-records">Overriding Log records<a class="headerlink" href="#overriding-log-records" title="Permanent link">&para;</a></h4>
-<details class="tip" open="open">
-<summary>Tip</summary>
-<p>Use <code>datefmt</code> for custom date formats - We honour standard <a href="https://docs.python.org/3/howto/logging.html#displaying-the-date-time-in-messages" target="_blank">logging library string formats</a>.</p>
-<p>Prefer using <a href="https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes" target="_blank">datetime string formats</a>? Set <code>use_datetime_directive</code> at Logger constructor or at <a href="#lambdapowertoolsformatter">Lambda Powertools Formatter</a>.</p>
-</details>
 <p>You might want to continue to use the same date formatting style, or override <code>location</code> to display the <code>package.function_name:line_number</code> as you previously had.</p>
-<p>Logger allows you to either change the format or suppress the following keys altogether at the initialization: <code>location</code>, <code>timestamp</code>, <code>level</code>, <code>xray_trace_id</code>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="15:2"><input checked="checked" id="__tabbed_15_1" name="__tabbed_15" type="radio" /><input id="__tabbed_15_2" name="__tabbed_15" type="radio" /><div class="tabbed-labels"><label for="__tabbed_15_1">overriding_log_records.py</label><label for="__tabbed_15_2">overriding_log_records_output.json</label></div>
+<p>Logger allows you to either change the format or suppress the following keys at initialization: <code>location</code>, <code>timestamp</code>, <code>xray_trace_id</code>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="16:2"><input checked="checked" id="__tabbed_16_1" name="__tabbed_16" type="radio" /><input id="__tabbed_16_2" name="__tabbed_16" type="radio" /><div class="tabbed-labels"><label for="__tabbed_16_1">overriding_log_records.py</label><label for="__tabbed_16_2">overriding_log_records_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2827,42 +2905,56 @@
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span>
 
-<span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %I:%M:%S %p&quot;</span>
 <span class="n">location_format</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">%(funcName)s</span><span class="s2">] </span><span class="si">%(module)s</span><span class="s2">&quot;</span>
 
 <span class="c1"># override location and timestamp format</span>
-<span class="hll"><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;payment&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location_format</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="n">date_format</span><span class="p">)</span>
-</span>
-<span class="c1"># suppress the location key with a None value</span>
-<span class="hll"><span class="n">logger_two</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;payment&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Collecting payment&quot;</span><span class="p">)</span>
+<span class="hll"><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;payment&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location_format</span><span class="p">)</span>
+</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Collecting payment&quot;</span><span class="p">)</span>
+
+<span class="c1"># suppress keys with a None value</span>
+<span class="hll"><span class="n">logger_two</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;loyalty&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span class="n">logger_two</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating points&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="hll"><span class="w">    </span><span class="nt">&quot;location&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[&lt;module&gt;] lambda_handler&quot;</span><span class="p">,</span><span class="w"></span>
-</span><span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Collecting payment&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="hll"><span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;02/09/2021 09:25:17 AM&quot;</span><span class="p">,</span><span class="w"></span>
-</span><span class="w">    </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;payment&quot;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="hll"><span class="w">        </span><span class="nt">&quot;location&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[&lt;module&gt;] overriding_log_records&quot;</span><span class="p">,</span><span class="w"></span>
+</span><span class="w">        </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Collecting payment&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2022-10-28 14:40:43,801+0200&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;payment&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Calculating points&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2022-10-28 14:40:43,801+0200&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;loyalty&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
 </code></pre></div></td></tr></table></div>
 </div>
 </div>
 </div>
 <h4 id="reordering-log-keys-position">Reordering log keys position<a class="headerlink" href="#reordering-log-keys-position" title="Permanent link">&para;</a></h4>
 <p>You can change the order of <a href="#standard-structured-keys">standard Logger keys</a> or any keys that will be appended later at runtime via the <code>log_record_order</code> parameter.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="16:2"><input checked="checked" id="__tabbed_16_1" name="__tabbed_16" type="radio" /><input id="__tabbed_16_2" name="__tabbed_16" type="radio" /><div class="tabbed-labels"><label for="__tabbed_16_1">reordering_log_keys.py</label><label for="__tabbed_16_2">reordering_log_keys_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="17:2"><input checked="checked" id="__tabbed_17_1" name="__tabbed_17" type="radio" /><input id="__tabbed_17_2" name="__tabbed_17" type="radio" /><div class="tabbed-labels"><label for="__tabbed_17_1">reordering_log_keys.py</label><label for="__tabbed_17_2">reordering_log_keys_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2928,7 +3020,7 @@
 </div>
 <h4 id="setting-timestamp-to-utc">Setting timestamp to UTC<a class="headerlink" href="#setting-timestamp-to-utc" title="Permanent link">&para;</a></h4>
 <p>By default, this Logger and standard logging library emits records using local time timestamp. You can override this behavior via <code>utc</code> parameter:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="17:2"><input checked="checked" id="__tabbed_17_1" name="__tabbed_17" type="radio" /><input id="__tabbed_17_2" name="__tabbed_17" type="radio" /><div class="tabbed-labels"><label for="__tabbed_17_1">setting_utc_timestamp.py</label><label for="__tabbed_17_2">setting_utc_timestamp_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="18:2"><input checked="checked" id="__tabbed_18_1" name="__tabbed_18" type="radio" /><input id="__tabbed_18_2" name="__tabbed_18" type="radio" /><div class="tabbed-labels"><label for="__tabbed_18_1">setting_utc_timestamp.py</label><label for="__tabbed_18_2">setting_utc_timestamp_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -2984,7 +3076,7 @@
 </div>
 <h4 id="custom-function-for-unserializable-values">Custom function for unserializable values<a class="headerlink" href="#custom-function-for-unserializable-values" title="Permanent link">&para;</a></h4>
 <p>By default, Logger uses <code>str</code> to handle values non-serializable by JSON. You can override this behavior via <code>json_default</code> parameter by passing a Callable:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="18:2"><input checked="checked" id="__tabbed_18_1" name="__tabbed_18" type="radio" /><input id="__tabbed_18_2" name="__tabbed_18" type="radio" /><div class="tabbed-labels"><label for="__tabbed_18_1">unserializable_values.py</label><label for="__tabbed_18_2">unserializable_values_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="19:2"><input checked="checked" id="__tabbed_19_1" name="__tabbed_19" type="radio" /><input id="__tabbed_19_2" name="__tabbed_19" type="radio" /><div class="tabbed-labels"><label for="__tabbed_19_1">unserializable_values.py</label><label for="__tabbed_19_2">unserializable_values_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -3081,7 +3173,7 @@
 <p>The most common use cases are remapping keys by bringing your existing schema, and redacting sensitive information you know upfront.</p>
 </details>
 <p>For these, you can override the <code>serialize</code> method from <a href="#lambdapowertoolsformatter">LambdaPowertoolsFormatter</a>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="19:2"><input checked="checked" id="__tabbed_19_1" name="__tabbed_19" type="radio" /><input id="__tabbed_19_2" name="__tabbed_19" type="radio" /><div class="tabbed-labels"><label for="__tabbed_19_1">bring_your_own_formatter.py</label><label for="__tabbed_19_2">bring_your_own_formatter_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="20:2"><input checked="checked" id="__tabbed_20_1" name="__tabbed_20" type="radio" /><input id="__tabbed_20_2" name="__tabbed_20" type="radio" /><div class="tabbed-labels"><label for="__tabbed_20_1">bring_your_own_formatter.py</label><label for="__tabbed_20_2">bring_your_own_formatter_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -3135,7 +3227,7 @@
 <summary>Warning</summary>
 <p>You will need to implement <code>append_keys</code>, <code>clear_state</code>, override <code>format</code>, and optionally <code>remove_keys</code> to keep the same feature set Powertools Logger provides. This also means keeping state of logging keys added.</p>
 </details>
-<div class="tabbed-set tabbed-alternate" data-tabs="20:2"><input checked="checked" id="__tabbed_20_1" name="__tabbed_20" type="radio" /><input id="__tabbed_20_2" name="__tabbed_20" type="radio" /><div class="tabbed-labels"><label for="__tabbed_20_1">bring_your_own_formatter_from_scratch.py</label><label for="__tabbed_20_2">bring_your_own_formatter_from_scratch_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="21:2"><input checked="checked" id="__tabbed_21_1" name="__tabbed_21" type="radio" /><input id="__tabbed_21_2" name="__tabbed_21" type="radio" /><div class="tabbed-labels"><label for="__tabbed_21_1">bring_your_own_formatter_from_scratch.py</label><label for="__tabbed_21_2">bring_your_own_formatter_from_scratch_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -3290,7 +3382,7 @@
 <h3 id="inject-lambda-context">Inject Lambda Context<a class="headerlink" href="#inject-lambda-context" title="Permanent link">&para;</a></h3>
 <p>When unit testing your code that makes use of <code>inject_lambda_context</code> decorator, you need to pass a dummy Lambda Context, or else Logger will fail.</p>
 <p>This is a Pytest sample that provides the minimum information necessary for Logger to succeed:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="21:2"><input checked="checked" id="__tabbed_21_1" name="__tabbed_21" type="radio" /><input id="__tabbed_21_2" name="__tabbed_21" type="radio" /><div class="tabbed-labels"><label for="__tabbed_21_1">fake_lambda_context_for_logger.py</label><label for="__tabbed_21_2">fake_lambda_context_for_logger_module.py</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="22:2"><input checked="checked" id="__tabbed_22_1" name="__tabbed_22" type="radio" /><input id="__tabbed_22_2" name="__tabbed_22" type="radio" /><div class="tabbed-labels"><label for="__tabbed_22_1">fake_lambda_context_for_logger.py</label><label for="__tabbed_22_2">fake_lambda_context_for_logger_module.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>Note that dataclasses are available in Python 3.7+ only.</p>
@@ -3448,7 +3540,7 @@ for the given name and level to the logging module. By default, this logs all bo
 <p>The Python standard library log records contains a <a href="https://docs.python.org/3/library/logging.html#logrecord-attributes" target="_blank">large set of attributes</a>, however only a few are included in Powertools Logger log record by default.</p>
 <p>You can include any of these logging attributes as key value arguments (<code>kwargs</code>) when instantiating <code>Logger</code> or <code>LambdaPowertoolsFormatter</code>.</p>
 <p>You can also add them later anywhere in your code with <code>append_keys</code>, or remove them with <code>remove_keys</code> methods.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="22:2"><input checked="checked" id="__tabbed_22_1" name="__tabbed_22" type="radio" /><input id="__tabbed_22_2" name="__tabbed_22" type="radio" /><div class="tabbed-labels"><label for="__tabbed_22_1">append_and_remove_keys.py</label><label for="__tabbed_22_2">append_and_remove_keys_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="23:2"><input checked="checked" id="__tabbed_23_1" name="__tabbed_23" type="radio" /><input id="__tabbed_23_2" name="__tabbed_23" type="radio" /><div class="tabbed-labels"><label for="__tabbed_23_1">append_and_remove_keys.py</label><label for="__tabbed_23_2">append_and_remove_keys_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -3524,7 +3616,7 @@ for the given name and level to the logging module. By default, this logs all bo
 <h3 id="whats-the-difference-between-append_keys-and-extra">What's the difference between <code>append_keys</code> and <code>extra</code>?<a class="headerlink" href="#whats-the-difference-between-append_keys-and-extra" title="Permanent link">&para;</a></h3>
 <p>Keys added with <code>append_keys</code> will persist across multiple log messages while keys added via <code>extra</code> will only be available in a given log message operation.</p>
 <p>Here's an example where we persist <code>payment_id</code> not <code>request_id</code>. Note that <code>payment_id</code> remains in both log messages while <code>booking_id</code> is only available in the first message.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="23:2"><input checked="checked" id="__tabbed_23_1" name="__tabbed_23" type="radio" /><input id="__tabbed_23_2" name="__tabbed_23" type="radio" /><div class="tabbed-labels"><label for="__tabbed_23_1">append_keys_vs_extra.py</label><label for="__tabbed_23_2">append_keys_vs_extra_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="24:2"><input checked="checked" id="__tabbed_24_1" name="__tabbed_24" type="radio" /><input id="__tabbed_24_2" name="__tabbed_24" type="radio" /><div class="tabbed-labels"><label for="__tabbed_24_1">append_keys_vs_extra.py</label><label for="__tabbed_24_2">append_keys_vs_extra_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -3638,7 +3730,7 @@ for the given name and level to the logging module. By default, this logs all bo
   <small>
     
       Last update:
-      2022-10-26
+      2022-10-28
     
   </small>
 </div>
