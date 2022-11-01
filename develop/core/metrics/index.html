@@ -557,6 +557,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#metrics-isolation" class="md-nav__link">
+    Metrics isolation
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1016,6 +1023,13 @@
           <li class="md-nav__item">
   <a href="#flushing-metrics-manually" class="md-nav__link">
     Flushing metrics manually
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-isolation" class="md-nav__link">
+    Metrics isolation
   </a>
   
 </li>
@@ -1857,6 +1871,102 @@
 <span class="hll">    <span class="k">with</span> <span class="n">single_metric</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;MySingleMetric&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">MetricUnit</span><span class="o">.</span><span class="n">Count</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">metric</span><span class="p">:</span>
 </span><span class="hll">        <span class="n">metric</span><span class="o">.</span><span class="n">add_dimension</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">STAGE</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
+<h3 id="metrics-isolation">Metrics isolation<a class="headerlink" href="#metrics-isolation" title="Permanent link">&para;</a></h3>
+<p>You can use <code>EphemeralMetrics</code> class when looking to isolate multiple instances of metrics with distinct namespaces and/or dimensions.</p>
+<div class="admonition note">
+<p class="admonition-title">This is a typical use case is for multi-tenant, or emitting same metrics for distinct applications.</p>
+</div>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">EphemeralMetrics usage</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.metrics</span> <span class="kn">import</span> <span class="n">EphemeralMetrics</span><span class="p">,</span> <span class="n">MetricUnit</span>
+</span><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
+
+<span class="hll"><span class="n">metrics</span> <span class="o">=</span> <span class="n">EphemeralMetrics</span><span class="p">()</span>
+</span>
+
+<span class="nd">@metrics</span><span class="o">.</span><span class="n">log_metrics</span>
+<span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">):</span>
+    <span class="n">metrics</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;SuccessfulBooking&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">MetricUnit</span><span class="o">.</span><span class="n">Count</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>Differences between <code>EphemeralMetrics</code> and <code>Metrics</code></strong></p>
+<p><code>EphemeralMetrics</code> has only two differences while keeping nearly the exact same set of features:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Metrics</th>
+<th>EphemeralMetrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Share data across instances</strong> (metrics, dimensions, metadata, etc.)</td>
+<td>Yes</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong><a href="#adding-default-dimensions">Default dimensions</a> that persists across Lambda invocations</strong> (metric flush)</td>
+<td>Yes</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition question">
+<p class="admonition-title">Why not changing the default <code>Metrics</code> behaviour to not share data across instances?</p>
+</div>
+<p>This is an intentional design to prevent accidental data deduplication or data loss issues due to <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Specification.html" target="_blank">CloudWatch EMF</a> metric dimension constraint.</p>
+<p>In CloudWatch, there are two metric ingestion mechanisms: <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Specification.html" target="_blank">EMF (async)</a> and <a href="https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cloudwatch.html#CloudWatch.Client.put_metric_data" target="_blank"><code>PutMetricData</code> API (sync)</a>.</p>
+<p>The former creates metrics asynchronously via CloudWatch Logs, and the latter uses a synchronous and more flexible ingestion API.</p>
+<div class="admonition important">
+<p class="admonition-title">Key concept</p>
+<p>CloudWatch <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric" target="_blank">considers a metric unique</a> by a combination of metric <strong>name</strong>, metric <strong>namespace</strong>, and zero or more metric <strong>dimensions</strong>.</p>
+</div>
+<p>With EMF, metric dimensions are shared with any metrics you define. With <code>PutMetricData</code> API, you can set a <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDatum.html">list</a> defining one or more metrics with distinct dimensions.</p>
+<p>This is a subtle yet important distinction. Imagine you had the following metrics to emit:</p>
+<table>
+<thead>
+<tr>
+<th>Metric Name</th>
+<th>Dimension</th>
+<th>Intent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SuccessfulBooking</strong></td>
+<td>service="booking", <strong>tenant_id</strong>="sample"</td>
+<td>Application metric</td>
+</tr>
+<tr>
+<td><strong>IntegrationLatency</strong></td>
+<td>service="booking", function_name="sample"</td>
+<td>Operational metric</td>
+</tr>
+<tr>
+<td><strong>ColdStart</strong></td>
+<td>service="booking", function_name="sample"</td>
+<td>Operational metric</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>tenant_id</code> dimension could vary leading to two common issues:</p>
+<ol>
+<li><code>ColdStart</code> metric will be created multiple times (N * number of unique tenant_id dimension value), despite the <code>function_name</code> being the same</li>
+<li><code>IntegrationLatency</code> metric will be also created multiple times due to <code>tenant_id</code> as well as <code>function_name</code> (may or not be intentional)</li>
+</ol>
+<p>These issues are exacerbated when you create <strong>(A)</strong> metric dimensions conditionally, <strong>(B)</strong> multiple metrics' instances throughout your code  instead of reusing them (globals). Subsequent metrics' instances will have (or lack) different metric dimensions resulting in different metrics and data points with the same name.</p>
+<div class="admonition note">
+<p class="admonition-title">Intentional design to address these scenarios</p>
+</div>
+<p><strong>On 1</strong>, when you enable <a href="#capturing-cold-start-metric">capture_start_metric feature</a>, we transparently create and flush an additional EMF JSON Blob that is independent from your application metrics. This prevents data pollution.</p>
+<p><strong>On 2</strong>, you can use <code>EphemeralMetrics</code> to create an additional EMF JSON Blob from your application metric (<code>SuccessfulBooking</code>). This ensures that <code>IntegrationLatency</code> operational metric data points aren't tied to any dynamic dimension values like <code>tenant_id</code>.</p>
+<p>That is why <code>Metrics</code> shares data across instances by default, as that covers 80% of use cases and different personas using Powertools. This allows them to instantiate <code>Metrics</code> in multiple places throughout their code - be a separate file, a middleware, or an abstraction that sets default dimensions.</p>
 <h2 id="testing-your-code">Testing your code<a class="headerlink" href="#testing-your-code" title="Permanent link">&para;</a></h2>
 <h3 id="environment-variables">Environment variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
 <details class="tip" open="open">
@@ -2064,7 +2174,7 @@
   <small>
     
       Last update:
-      2022-08-05
+      2022-11-01
     
   </small>
 </div>
