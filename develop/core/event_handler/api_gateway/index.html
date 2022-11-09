@@ -4111,8 +4111,7 @@ your development, building, deployment tooling need to accommodate the distinct 
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="normal">29</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="kn">import</span> <span class="nn">assert_rest_api_resolver_response</span>
 <span class="kn">import</span> <span class="nn">pytest</span>
@@ -4138,7 +4137,6 @@ your development, building, deployment tooling need to accommodate the distinct 
 </span><span class="hll">    <span class="p">}</span>
 </span>    <span class="c1"># Example of API Gateway REST API request event:</span>
     <span class="c1"># https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event</span>
-
     <span class="n">ret</span> <span class="o">=</span> <span class="n">assert_rest_api_resolver_response</span><span class="o">.</span><span class="n">lambda_handler</span><span class="p">(</span><span class="n">minimal_event</span><span class="p">,</span> <span class="n">lambda_context</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">ret</span><span class="p">[</span><span class="s2">&quot;statusCode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">200</span>
     <span class="k">assert</span> <span class="n">ret</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span>
