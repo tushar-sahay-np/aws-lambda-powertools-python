@@ -2719,6 +2719,10 @@
 <span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
+<details class="info" open="open">
+<summary>Info</summary>
+<p>The <code>exception_handler</code> also supports passing a list of exception types you wish to handle with one handler.</p>
+</details>
 <h3 id="raising-http-errors">Raising HTTP errors<a class="headerlink" href="#raising-http-errors" title="Permanent link">&para;</a></h3>
 <p>You can easily raise any HTTP Error back to the client using <code>ServiceError</code> exception. This ensures your Lambda function doesn't fail but return the correct HTTP response signalling the error.</p>
 <details class="info" open="open">
@@ -4611,7 +4615,7 @@ it made it impossible for static checkers like Mypy and IDEs IntelliSense to kno
   <small>
     
       Last update:
-      2022-11-09
+      2022-11-14
     
   </small>
 </div>
