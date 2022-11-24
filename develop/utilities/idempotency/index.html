@@ -1537,10 +1537,10 @@ estimate the cost.</p>
 
 <span class="nd">@batch_processor</span><span class="p">(</span><span class="n">record_handler</span><span class="o">=</span><span class="n">record_handler</span><span class="p">,</span> <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">register_lambda_context</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="c1"># see Lambda timeouts section</span>
     <span class="c1"># `data` parameter must be called as a keyword argument to work</span>
 <span class="hll">    <span class="n">dummy</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;universe&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-</span>    <span class="n">config</span><span class="o">.</span><span class="n">register_lambda_context</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="c1"># see Lambda timeouts section</span>
-    <span class="k">return</span> <span class="n">processor</span><span class="o">.</span><span class="n">response</span><span class="p">()</span>
+</span>    <span class="k">return</span> <span class="n">processor</span><span class="o">.</span><span class="n">response</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
@@ -3176,7 +3176,7 @@ This means it is possible to pass a mocked Table resource, or stub various metho
   <small>
     
       Last update:
-      2022-11-17
+      2022-11-24
     
   </small>
 </div>
