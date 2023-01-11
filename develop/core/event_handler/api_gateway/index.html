@@ -742,6 +742,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#specialized-router-types" class="md-nav__link">
+    Specialized router types
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#sharing-contextual-data" class="md-nav__link">
     Sharing contextual data
   </a>
@@ -1330,6 +1337,13 @@
           <li class="md-nav__item">
   <a href="#route-prefix" class="md-nav__link">
     Route prefix
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specialized-router-types" class="md-nav__link">
+    Specialized router types
   </a>
   
 </li>
@@ -3896,6 +3910,79 @@ Some event sources require headers and cookies to be encoded as <code>multiValue
 </div>
 </div>
 </div>
+<h4 id="specialized-router-types">Specialized router types<a class="headerlink" href="#specialized-router-types" title="Permanent link">&para;</a></h4>
+<p>You can use specialized router classes according to the type of event that you are resolving. This way you'll get type hints from your IDE as you access the <code>current_event</code> property.</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th>Resolver</th>
+<th><code>current_event</code> type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>APIGatewayRouter</td>
+<td>APIGatewayRestResolver</td>
+<td>APIGatewayProxyEvent</td>
+</tr>
+<tr>
+<td>APIGatewayHttpRouter</td>
+<td>APIGatewayHttpResolver</td>
+<td>APIGatewayProxyEventV2</td>
+</tr>
+<tr>
+<td>ALBRouter</td>
+<td>ALBResolver</td>
+<td>ALBEvent</td>
+</tr>
+<tr>
+<td>LambdaFunctionUrlRouter</td>
+<td>LambdaFunctionUrlResolver</td>
+<td>LambdaFunctionUrlEvent</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.event_handler</span> <span class="kn">import</span> <span class="n">APIGatewayRestResolver</span>
+</span><span class="kn">from</span> <span class="nn">aws_lambda_powertools.event_handler.router</span> <span class="kn">import</span> <span class="n">APIGatewayRouter</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">APIGatewayRestResolver</span><span class="p">()</span>
+<span class="hll"><span class="n">router</span> <span class="o">=</span> <span class="n">APIGatewayRouter</span><span class="p">()</span>
+</span>
+
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/me&quot;</span><span class="p">)</span>
+<span class="hll"><span class="k">def</span> <span class="nf">get_self</span><span class="p">():</span>
+</span>    <span class="c1"># router.current_event is a APIGatewayProxyEvent</span>
+    <span class="n">account_id</span> <span class="o">=</span> <span class="n">router</span><span class="o">.</span><span class="n">current_event</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">account_id</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;account_id&quot;</span><span class="p">:</span> <span class="n">account_id</span><span class="p">}</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">router</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
 <h4 id="sharing-contextual-data">Sharing contextual data<a class="headerlink" href="#sharing-contextual-data" title="Permanent link">&para;</a></h4>
 <p>You can use <code>append_context</code> when you want to share data between your App and Router instances. Any data you share will be available via the <code>context</code> dictionary available in your App or Router context.</p>
 <details class="info" open="open">
@@ -4636,7 +4723,7 @@ it made it impossible for static checkers like Mypy and IDEs IntelliSense to kno
   <small>
     
       Last update:
-      2022-11-14
+      2023-01-11
     
   </small>
 </div>
