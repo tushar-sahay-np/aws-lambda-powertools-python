@@ -19,7 +19,7 @@
         <link rel="next" href="../appsync/">
       
       <link rel="icon" href="../../../media/aws-logo-light.svg">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.5">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
@@ -1640,7 +1640,48 @@
 <p>For resolvers, we provide: <code>APIGatewayRestResolver</code>, <code>APIGatewayHttpResolver</code>, <code>ALBResolver</code>, and <code>LambdaFunctionUrlResolver</code>. From here on, we will default to <code>APIGatewayRestResolver</code> across examples.</p>
 <details class="info" open="open">
 <summary>Auto-serialization</summary>
-<p>We serialize <code>Dict</code> responses as JSON, trim whitespace for compact responses, and set content-type to <code>application/json</code>.</p>
+<p>We serialize <code>Dict</code> responses as JSON, trim whitespace for compact responses, set content-type to <code>application/json</code>, and
+return a 200 OK HTTP status. You can optionally set a different HTTP status code as the second argument of the tuple:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">Response</span>
+
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.event_handler</span> <span class="kn">import</span> <span class="n">ALBResolver</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">ALBResolver</span><span class="p">()</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/todo&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">create_todo</span><span class="p">():</span>
+    <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">current_event</span><span class="o">.</span><span class="n">json_body</span>
+    <span class="n">todo</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;https://jsonplaceholder.typicode.com/todos&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+<span class="hll">    <span class="c1"># Returns the created todo object, with a HTTP 201 Created status</span>
+</span><span class="hll">    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;todo&quot;</span><span class="p">:</span> <span class="n">todo</span><span class="o">.</span><span class="n">json</span><span class="p">()},</span> <span class="mi">201</span>
+</span>
+
+<span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
 </details>
 <h4 id="api-gateway-rest-api">API Gateway REST API<a class="headerlink" href="#api-gateway-rest-api" title="Permanent link">&para;</a></h4>
 <p>When using Amazon API Gateway REST API to front your Lambda functions, you can use <code>APIGatewayRestResolver</code>.</p>
@@ -4723,7 +4764,7 @@ it made it impossible for static checkers like Mypy and IDEs IntelliSense to kno
   <small>
     
       Last update:
-      2023-01-11
+      2023-01-24
     
   </small>
 </div>
