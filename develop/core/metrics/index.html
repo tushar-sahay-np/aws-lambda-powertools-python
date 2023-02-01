@@ -1877,6 +1877,77 @@ We encourage you to read our <a href="/upgrade/#end-of-support-v1">upgrade guide
 </div>
 </div>
 </div>
+<p>By default it will skip all previously defined dimensions including default dimensions. Use <code>default_dimensions</code> keyword argument if you want to reuse default dimensions or specify custom dimensions from a dictionary.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">single_metric_default_dimensions_inherit.json</label><label for="__tabbed_8_2">single_metric_default_dimensions.py</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="err">impor</span><span class="kc">t</span><span class="w"> </span><span class="err">os</span>
+
+<span class="kc">fr</span><span class="err">om</span><span class="w"> </span><span class="err">aws_lambda_power</span><span class="kc">t</span><span class="err">ools</span><span class="w"> </span><span class="err">impor</span><span class="kc">t</span><span class="w"> </span><span class="err">si</span><span class="kc">n</span><span class="err">gle_me</span><span class="kc">tr</span><span class="err">ic</span>
+<span class="kc">fr</span><span class="err">om</span><span class="w"> </span><span class="err">aws_lambda_power</span><span class="kc">t</span><span class="err">ools.me</span><span class="kc">tr</span><span class="err">ics</span><span class="w"> </span><span class="err">impor</span><span class="kc">t</span><span class="w"> </span><span class="err">Me</span><span class="kc">tr</span><span class="err">ics</span><span class="p">,</span><span class="w"> </span><span class="err">Me</span><span class="kc">tr</span><span class="err">icU</span><span class="kc">n</span><span class="err">i</span><span class="kc">t</span>
+<span class="kc">fr</span><span class="err">om</span><span class="w"> </span><span class="err">aws_lambda_power</span><span class="kc">t</span><span class="err">ools.u</span><span class="kc">t</span><span class="err">ili</span><span class="kc">t</span><span class="err">ies.</span><span class="kc">t</span><span class="err">ypi</span><span class="kc">n</span><span class="err">g</span><span class="w"> </span><span class="err">impor</span><span class="kc">t</span><span class="w"> </span><span class="err">LambdaCo</span><span class="kc">nte</span><span class="err">x</span><span class="kc">t</span>
+
+<span class="err">STAGE</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">os.ge</span><span class="kc">ten</span><span class="err">v(</span><span class="s2">&quot;STAGE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;dev&quot;</span><span class="err">)</span>
+
+<span class="err">me</span><span class="kc">tr</span><span class="err">ics</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">Me</span><span class="kc">tr</span><span class="err">ics()</span>
+<span class="hll"><span class="err">me</span><span class="kc">tr</span><span class="err">ics.se</span><span class="kc">t</span><span class="err">_de</span><span class="kc">fault</span><span class="err">_dime</span><span class="kc">ns</span><span class="err">io</span><span class="kc">ns</span><span class="err">(e</span><span class="kc">n</span><span class="err">viro</span><span class="kc">n</span><span class="err">me</span><span class="kc">nt</span><span class="err">=STAGE)</span>
+</span>
+
+<span class="err">de</span><span class="kc">f</span><span class="w"> </span><span class="err">lambda_ha</span><span class="kc">n</span><span class="err">dler(eve</span><span class="kc">nt</span><span class="p">:</span><span class="w"> </span><span class="err">dic</span><span class="kc">t</span><span class="p">,</span><span class="w"> </span><span class="err">co</span><span class="kc">nte</span><span class="err">x</span><span class="kc">t</span><span class="p">:</span><span class="w"> </span><span class="err">LambdaCo</span><span class="kc">nte</span><span class="err">x</span><span class="kc">t</span><span class="err">)</span><span class="p">:</span>
+<span class="w">    </span><span class="err">wi</span><span class="kc">t</span><span class="err">h</span><span class="w"> </span><span class="err">si</span><span class="kc">n</span><span class="err">gle_me</span><span class="kc">tr</span><span class="err">ic(</span>
+<span class="hll"><span class="w">        </span><span class="kc">na</span><span class="err">me=</span><span class="s2">&quot;RecordsCount&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">u</span><span class="kc">n</span><span class="err">i</span><span class="kc">t</span><span class="err">=Me</span><span class="kc">tr</span><span class="err">icU</span><span class="kc">n</span><span class="err">i</span><span class="kc">t</span><span class="err">.Cou</span><span class="kc">nt</span><span class="p">,</span><span class="w"> </span><span class="err">value=</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="err">de</span><span class="kc">fault</span><span class="err">_dime</span><span class="kc">ns</span><span class="err">io</span><span class="kc">ns</span><span class="err">=me</span><span class="kc">tr</span><span class="err">ics.de</span><span class="kc">fault</span><span class="err">_dime</span><span class="kc">ns</span><span class="err">io</span><span class="kc">ns</span>
+</span><span class="w">    </span><span class="err">)</span><span class="w"> </span><span class="err">as</span><span class="w"> </span><span class="err">me</span><span class="kc">tr</span><span class="err">ic</span><span class="p">:</span>
+<span class="w">        </span><span class="err">me</span><span class="kc">tr</span><span class="err">ic.add_dime</span><span class="kc">ns</span><span class="err">io</span><span class="kc">n</span><span class="err">(</span><span class="kc">na</span><span class="err">me=</span><span class="s2">&quot;TableName&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">value=</span><span class="s2">&quot;Users&quot;</span><span class="err">)</span>
+</code></pre></div></td></tr></table></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">single_metric</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.metrics</span> <span class="kn">import</span> <span class="n">MetricUnit</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
+
+<span class="n">STAGE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;STAGE&quot;</span><span class="p">,</span> <span class="s2">&quot;dev&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">single_metric</span><span class="p">(</span>
+<span class="hll">        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;RecordsCount&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">MetricUnit</span><span class="o">.</span><span class="n">Count</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">default_dimensions</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="n">STAGE</span><span class="p">}</span>
+</span>    <span class="p">)</span> <span class="k">as</span> <span class="n">metric</span><span class="p">:</span>
+        <span class="n">metric</span><span class="o">.</span><span class="n">add_dimension</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;TableName&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;Users&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+</div>
+</div>
+</div>
 <h3 id="flushing-metrics-manually">Flushing metrics manually<a class="headerlink" href="#flushing-metrics-manually" title="Permanent link">&para;</a></h3>
 <p>If you prefer not to use <code>log_metrics</code> because you might want to encapsulate additional logic when doing so, you can manually flush and clear metrics as follows:</p>
 <details class="warning" open="open">
@@ -2049,7 +2120,7 @@ We encourage you to read our <a href="/upgrade/#end-of-support-v1">upgrade guide
 </code></pre></div></td></tr></table></div>
 <h3 id="functional-testing">Functional testing<a class="headerlink" href="#functional-testing" title="Permanent link">&para;</a></h3>
 <p>You can read standard output and assert whether metrics have been flushed. Here's an example using <code>pytest</code> with <code>capsys</code> built-in fixture:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="8:4"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><input id="__tabbed_8_3" name="__tabbed_8" type="radio" /><input id="__tabbed_8_4" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">assert_single_emf_blob.py</label><label for="__tabbed_8_2">add_metrics.py</label><label for="__tabbed_8_3">assert_multiple_emf_blobs.py</label><label for="__tabbed_8_4">assert_multiple_emf_blobs_module.py</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="9:4"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><input id="__tabbed_9_4" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">assert_single_emf_blob.py</label><label for="__tabbed_9_2">add_metrics.py</label><label for="__tabbed_9_3">assert_multiple_emf_blobs.py</label><label for="__tabbed_9_4">assert_multiple_emf_blobs_module.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2210,7 +2281,7 @@ We encourage you to read our <a href="/upgrade/#end-of-support-v1">upgrade guide
   <small>
     
       Last update:
-      2022-11-01
+      2023-02-01
     
   </small>
 </div>
