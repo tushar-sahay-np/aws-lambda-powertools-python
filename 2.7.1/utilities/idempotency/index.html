@@ -722,7 +722,12 @@ We encourage you to read our <a href="/upgrade/#end-of-support-v1">upgrade guide
   
     <nav class="md-nav" aria-label="Getting started">
       <ul class="md-nav__list">
-        
+
+        <li class="md-nav__item">
+  <a href="#iam-permissions" class="md-nav__link">
+    IAM Permissions
+  </a>
+
           <li class="md-nav__item">
   <a href="#required-resources" class="md-nav__link">
     Required resources
@@ -1097,7 +1102,12 @@ We encourage you to read our <a href="/upgrade/#end-of-support-v1">upgrade guide
   
     <nav class="md-nav" aria-label="Getting started">
       <ul class="md-nav__list">
-        
+
+          <li class="md-nav__item">
+  <a href="#iam-permissions" class="md-nav__link">
+    IAM Permissions
+  </a>
+
           <li class="md-nav__item">
   <a href="#required-resources" class="md-nav__link">
     Required resources
@@ -1380,6 +1390,12 @@ times with the same parameters</strong>. This makes idempotent operations safe t
 <li>Expires in-progress executions if the Lambda function times out halfway through</li>
 </ul>
 <h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
+<h3 id="iam-permissions">IAM Permissions<a class="headerlink" href="#iam-permissions" title="Permanent link">&para;</a></h3>
+<p>Your Lambda function IAM Role must have <code>dynamodb:GetItem</code>, <code>dynamodb:PutItem</code>, <code>dynamodb:UpdateItem</code> and <code>dynamodb:DeleteItem</code> IAM permissions before using this feature.</p>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>If you're using our example <a href="#required-resources">AWS Serverless Application Model (SAM)</a>, it already adds the required permissions.</p>
+</details>
 <h3 id="required-resources">Required resources<a class="headerlink" href="#required-resources" title="Permanent link">&para;</a></h3>
 <p>Before getting started, you need to create a persistent storage layer where the idempotency utility can store its state - your lambda functions will need read and write access to it.</p>
 <p>As of now, Amazon DynamoDB is the only supported persistent storage layer, so you'll need to create a table first.</p>
