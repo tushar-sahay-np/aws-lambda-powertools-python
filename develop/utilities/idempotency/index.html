@@ -1549,10 +1549,8 @@ estimate the cost.</p>
 <p class="admonition-title">We support JSON serializable data, <a href="https://docs.python.org/3.7/library/dataclasses.html" target="_blank">Python Dataclasses</a>, <a href="../parser/" target="_blank">Parser/Pydantic Models</a>, and our <a href="../data_classes/" target="_blank">Event Source Data Classes</a>.</p>
 </div>
 <details class="warning" open="open">
-<summary>Limitations</summary>
+<summary>Limitation</summary>
 <p>Make sure to call your decorated function using keyword arguments.</p>
-<p>Decorated functions with <code>idempotent_function</code> are not thread-safe, if the caller uses threading, not the function computation itself.</p>
-<p>DynamoDB Persistency layer uses a Resource client <a href="https://boto3.amazonaws.com/v1/documentation/api/latest/guide/resources.html?highlight=multithreading#multithreading-or-multiprocessing-with-resources" target="_blank">which is not thread-safe</a>.</p>
 </details>
 <div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">dataclass_sample.py</label><label for="__tabbed_2_2">parser_pydantic_sample.py</label></div>
 <div class="tabbed-content">
@@ -3266,7 +3264,7 @@ This means it is possible to pass a mocked Table resource, or stub various metho
   <small>
     
       Last update:
-      2023-02-06
+      2023-02-09
     
   </small>
 </div>
