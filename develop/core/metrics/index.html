@@ -498,6 +498,13 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 </li>
         
           <li class="md-nav__item">
+  <a href="#adding-high-resolution-metrics" class="md-nav__link">
+    Adding high-resolution metrics
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adding-multi-value-metrics" class="md-nav__link">
     Adding multi-value metrics
   </a>
@@ -990,6 +997,13 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 </li>
         
           <li class="md-nav__item">
+  <a href="#adding-high-resolution-metrics" class="md-nav__link">
+    Adding high-resolution metrics
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adding-multi-value-metrics" class="md-nav__link">
     Adding multi-value metrics
   </a>
@@ -1145,6 +1159,9 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <ul>
 <li><strong>Namespace</strong>. It's the highest level container that will group multiple metrics from multiple services for a given application, for example <code>ServerlessEcommerce</code>.</li>
 <li><strong>Dimensions</strong>. Metrics metadata in key-value format. They help you slice and dice metrics visualization, for example <code>ColdStart</code> metric by Payment <code>service</code>.</li>
+<li><strong>Metric</strong>. It's the name of the metric, for example: <code>SuccessfulBooking</code> or <code>UpdatedBooking</code>.</li>
+<li><strong>Unit</strong>. It's a value representing the unit of measure for the corresponding metric, for example: <code>Count</code> or <code>Seconds</code>.</li>
+<li><strong>Resolution</strong>. It's a value representing the storage resolution for the corresponding metric. Metrics can be either Standard or High resolution. Read more <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html#high-resolution-metrics">here</a>.</li>
 </ul>
 <figure>
   <img src="../../media/metrics_terminology.png" />
@@ -1314,9 +1331,45 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <summary>Warning: Do not create metrics or dimensions outside the handler</summary>
 <p>Metrics or dimensions added in the global scope will only be added during cold start. Disregard if you that's the intended behavior.</p>
 </details>
+<h3 id="adding-high-resolution-metrics">Adding high-resolution metrics<a class="headerlink" href="#adding-high-resolution-metrics" title="Permanent link">&para;</a></h3>
+<p>You can create <a href="https://aws.amazon.com/pt/about-aws/whats-new/2023/02/amazon-cloudwatch-high-resolution-metric-extraction-structured-logs/">high-resolution metrics</a> passing <code>resolution</code> parameter to <code>add_metric</code>.</p>
+<details class="tip" open="open">
+<summary>High-resolution metrics - when is it useful?</summary>
+<p>High-resolution metrics are data with a granularity of one second and are very useful in several situations such as telemetry, time series, real-time incident management, and others.</p>
+</details>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">add_high_resolution_metrics.py</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Metrics</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.metrics</span> <span class="kn">import</span> <span class="n">MetricResolution</span><span class="p">,</span> <span class="n">MetricUnit</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
+
+<span class="n">metrics</span> <span class="o">=</span> <span class="n">Metrics</span><span class="p">()</span>
+
+
+<span class="nd">@metrics</span><span class="o">.</span><span class="n">log_metrics</span>  <span class="c1"># ensures metrics are flushed upon request completion/failure</span>
+<span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">):</span>
+<span class="hll">    <span class="n">metrics</span><span class="o">.</span><span class="n">add_metric</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;SuccessfulBooking&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">MetricUnit</span><span class="o">.</span><span class="n">Count</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">MetricResolution</span><span class="o">.</span><span class="n">High</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+</div>
+</div>
+</div>
+<details class="tip" open="open">
+<summary>Tip: Autocomplete Metric Resolutions</summary>
+<p><code>MetricResolution</code> enum facilitates finding a supported metric resolution by CloudWatch. Alternatively, you can pass the values 1 or 60 (must be one of them) as an integer <em>e.g. <code>resolution=1</code></em>.</p>
+</details>
 <h3 id="adding-multi-value-metrics">Adding multi-value metrics<a class="headerlink" href="#adding-multi-value-metrics" title="Permanent link">&para;</a></h3>
 <p>You can call <code>add_metric()</code> with the same metric name multiple times. The values will be grouped together in a list.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">add_multi_value_metrics.py</label><label for="__tabbed_2_2">add_multi_value_metrics_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">add_multi_value_metrics.py</label><label for="__tabbed_3_2">add_multi_value_metrics_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -1413,7 +1466,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <h3 id="adding-default-dimensions">Adding default dimensions<a class="headerlink" href="#adding-default-dimensions" title="Permanent link">&para;</a></h3>
 <p>You can use <code>set_default_dimensions</code> method, or <code>default_dimensions</code> parameter in <code>log_metrics</code> decorator, to persist dimensions across Lambda invocations.</p>
 <p>If you'd like to remove them at some point, you can use <code>clear_default_dimensions</code> method.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">set_default_dimensions.py</label><label for="__tabbed_3_2">set_default_dimensions_log_metrics.py</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">set_default_dimensions.py</label><label for="__tabbed_4_2">set_default_dimensions_log_metrics.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -1486,7 +1539,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <h3 id="flushing-metrics">Flushing metrics<a class="headerlink" href="#flushing-metrics" title="Permanent link">&para;</a></h3>
 <p>As you finish adding all your metrics, you need to serialize and flush them to standard output. You can do that automatically with the <code>log_metrics</code> decorator.</p>
 <p>This decorator also <strong>validates</strong>, <strong>serializes</strong>, and <strong>flushes</strong> all your metrics. During metrics validation, if no metrics are provided then a warning will be logged, but no exception will be raised.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">add_metrics.py</label><label for="__tabbed_4_2">log_metrics_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">add_metrics.py</label><label for="__tabbed_5_2">log_metrics_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -1601,7 +1654,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 </details>
 <h3 id="capturing-cold-start-metric">Capturing cold start metric<a class="headerlink" href="#capturing-cold-start-metric" title="Permanent link">&para;</a></h3>
 <p>You can optionally capture cold start metrics with <code>log_metrics</code> decorator via <code>capture_cold_start_metric</code> param.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">capture_cold_start_metric.py</label><label for="__tabbed_5_2">capture_cold_start_metric_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">capture_cold_start_metric.py</label><label for="__tabbed_6_2">capture_cold_start_metric_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -1698,7 +1751,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <summary>Info</summary>
 <p><strong>This will not be available during metrics visualization</strong> - Use <strong>dimensions</strong> for this purpose</p>
 </details>
-<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">add_metadata.py</label><label for="__tabbed_6_2">add_metadata_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">add_metadata.py</label><label for="__tabbed_7_2">add_metadata_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -1791,7 +1844,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <p>Generally, this would be an edge case since you <a href="https://aws.amazon.com/cloudwatch/pricing">pay for unique metric</a>. Keep the following formula in mind:</p>
 <p><strong>unique metric = (metric_name + dimension_name + dimension_value)</strong></p>
 </details>
-<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">single_metric.py</label><label for="__tabbed_7_2">single_metric_output.json</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">single_metric.py</label><label for="__tabbed_8_2">single_metric_output.json</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -1878,7 +1931,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 </div>
 </div>
 <p>By default it will skip all previously defined dimensions including default dimensions. Use <code>default_dimensions</code> keyword argument if you want to reuse default dimensions or specify custom dimensions from a dictionary.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">single_metric_default_dimensions_inherit.json</label><label for="__tabbed_8_2">single_metric_default_dimensions.py</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">single_metric_default_dimensions_inherit.json</label><label for="__tabbed_9_2">single_metric_default_dimensions.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2120,7 +2173,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 </code></pre></div></td></tr></table></div>
 <h3 id="functional-testing">Functional testing<a class="headerlink" href="#functional-testing" title="Permanent link">&para;</a></h3>
 <p>You can read standard output and assert whether metrics have been flushed. Here's an example using <code>pytest</code> with <code>capsys</code> built-in fixture:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="9:4"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><input id="__tabbed_9_4" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">assert_single_emf_blob.py</label><label for="__tabbed_9_2">add_metrics.py</label><label for="__tabbed_9_3">assert_multiple_emf_blobs.py</label><label for="__tabbed_9_4">assert_multiple_emf_blobs_module.py</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="10:4"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><input id="__tabbed_10_3" name="__tabbed_10" type="radio" /><input id="__tabbed_10_4" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">assert_single_emf_blob.py</label><label for="__tabbed_10_2">add_metrics.py</label><label for="__tabbed_10_3">assert_multiple_emf_blobs.py</label><label for="__tabbed_10_4">assert_multiple_emf_blobs_module.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2281,7 +2334,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
   <small>
     
       Last update:
-      2023-02-01
+      2023-02-10
     
   </small>
 </div>
