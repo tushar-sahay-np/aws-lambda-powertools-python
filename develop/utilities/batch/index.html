@@ -19,7 +19,7 @@
         <link rel="next" href="../typing/">
       
       <link rel="icon" href="../../media/aws-logo-light.svg">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -688,6 +688,13 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#processing-messages-asynchronously" class="md-nav__link">
+    Processing messages asynchronously
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1027,6 +1034,13 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
           <li class="md-nav__item">
   <a href="#partial-failure-mechanics" class="md-nav__link">
     Partial failure mechanics
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#processing-messages-asynchronously" class="md-nav__link">
+    Processing messages asynchronously
   </a>
   
 </li>
@@ -2214,6 +2228,72 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <p>You will not have access to the <strong>processed messages</strong> within the Lambda Handler; use context manager for that.</p>
 <p>All processing logic will and should be performed by the <code>record_handler</code> function.</p>
 </details>
+<h3 id="processing-messages-asynchronously">Processing messages asynchronously<a class="headerlink" href="#processing-messages-asynchronously" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">New to AsyncIO? Read this <a href="https://realpython.com/async-io-python/" target="_blank">comprehensive guide first</a>.</p>
+</div>
+<p>You can use <code>AsyncBatchProcessor</code> class and <code>async_batch_processor</code> decorator to process messages concurrently.</p>
+<details class="question" open="open">
+<summary>When is this useful?</summary>
+<p>Your use case might be able to process multiple records at the same time without conflicting with one another.</p>
+<p>For example, imagine you need to process multiple loyalty points and incrementally save in a database. While you await the database to confirm your records are saved, you could start processing another request concurrently.</p>
+<p>The reason this is not the default behaviour is that not all use cases can handle concurrency safely (e.g., loyalty points must be updated in order).</p>
+</details>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">High-concurrency with AsyncBatchProcessor</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">httpx</span>  <span class="c1"># external dependency</span>
+
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.batch</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="hll">    <span class="n">AsyncBatchProcessor</span><span class="p">,</span>
+</span>    <span class="n">EventType</span><span class="p">,</span>
+<span class="hll">    <span class="n">async_batch_processor</span><span class="p">,</span>
+</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.data_classes.sqs_event</span> <span class="kn">import</span> <span class="n">SQSRecord</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
+
+<span class="hll"><span class="n">processor</span> <span class="o">=</span> <span class="n">AsyncBatchProcessor</span><span class="p">(</span><span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">SQS</span><span class="p">)</span>
+</span>
+
+<span class="hll"><span class="k">async</span> <span class="k">def</span> <span class="nf">async_record_handler</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="n">SQSRecord</span><span class="p">):</span>
+</span>    <span class="c1"># Yield control back to the event loop to schedule other tasks</span>
+    <span class="c1"># while you await from a response from httpbin.org</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ret</span><span class="o">.</span><span class="n">status_code</span>
+
+
+<span class="hll"><span class="nd">@async_batch_processor</span><span class="p">(</span><span class="n">record_handler</span><span class="o">=</span><span class="n">async_record_handler</span><span class="p">,</span> <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">)</span>
+</span><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">processor</span><span class="o">.</span><span class="n">response</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+<details class="warning" open="open">
+<summary>Using tracer?</summary>
+<p><code>AsyncBatchProcessor</code> uses <code>asyncio.gather</code> which can cause side effects and reach trace limits at high concurrency.</p>
+<p>See <a href="../../core/tracer/#concurrent-asynchronous-functions">Tracing concurrent asynchronous functions</a>.</p>
+</details>
 <h2 id="advanced">Advanced<a class="headerlink" href="#advanced" title="Permanent link">&para;</a></h2>
 <h3 id="pydantic-integration">Pydantic integration<a class="headerlink" href="#pydantic-integration" title="Permanent link">&para;</a></h3>
 <p>You can bring your own Pydantic models via <strong><code>model</code></strong> parameter when inheriting from <strong><code>SqsRecordModel</code></strong>, <strong><code>KinesisDataStreamRecord</code></strong>, or <strong><code>DynamoDBStreamRecordModel</code></strong></p>
@@ -3184,7 +3264,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
   <small>
     
       Last update:
-      2022-10-21
+      2023-02-10
     
   </small>
 </div>
@@ -3237,7 +3317,7 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
     <script id="__config" type="application/json">{"base": "../..", "features": ["header.autohide", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "navigation.tracking", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="../../assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
         <script src="../../javascript/aws-amplify.min.js"></script>
       
