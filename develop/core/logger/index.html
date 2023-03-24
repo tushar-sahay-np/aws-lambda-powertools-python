@@ -2034,9 +2034,9 @@ We encourage you to read our <a href="../../upgrade/#end-of-support-v1">upgrade 
 <li>Add additional keys on a per log message basis as a keyword=value, or via <code>extra</code> parameter</li>
 </ul>
 <h4 id="append_keys-method">append_keys method<a class="headerlink" href="#append_keys-method" title="Permanent link">&para;</a></h4>
-<details class="note" open="open">
-<summary>Note</summary>
-<p><code>append_keys</code> replaces <code>structure_logs(append=True, **kwargs)</code> method. structure_logs will be removed in v2.</p>
+<details class="warning" open="open">
+<summary>Warning</summary>
+<p><code>append_keys</code> is not thread-safe, please see <a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/991" target="_blank">RFC</a>.</p>
 </details>
 <p>You can append your own keys to your existing Logger via <code>append_keys(**additional_key_values)</code> method.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">append_keys.py</label><label for="__tabbed_5_2">append_keys_output.json</label></div>
@@ -3864,7 +3864,7 @@ for the given name and level to the logging module. By default, this logs all bo
   <small>
     
       Last update:
-      2023-01-10
+      2023-03-24
     
   </small>
 </div>
