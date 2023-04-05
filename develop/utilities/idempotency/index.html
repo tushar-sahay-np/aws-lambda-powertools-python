@@ -3231,7 +3231,7 @@ with a truthy value. If you prefer setting this for specific tests, and are usin
 </div>
 </div>
 <h3 id="testing-with-dynamodb-local">Testing with DynamoDB Local<a class="headerlink" href="#testing-with-dynamodb-local" title="Permanent link">&para;</a></h3>
-<p>To test with <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html">DynamoDB Local</a>, you can replace the <code>Table</code> resource used by the persistence layer with one you create inside your tests. This allows you to set the endpoint_url.</p>
+<p>To test with <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html">DynamoDB Local</a>, you can replace the <code>DynamoDB client</code> used by the persistence layer with one you create inside your tests. This allows you to set the endpoint_url.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">tests.py</label><label for="__tabbed_9_2">app.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -3264,7 +3264,9 @@ with a truthy value. If you prefer setting this for specific tests, and are usin
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
-<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="kn">import</span> <span class="nn">boto3</span>
 <span class="kn">import</span> <span class="nn">pytest</span>
@@ -3287,11 +3289,13 @@ with a truthy value. If you prefer setting this for specific tests, and are usin
     <span class="k">return</span> <span class="n">LambdaContext</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">test_idempotent_lambda</span><span class="p">(</span><span class="n">lambda_context</span><span class="p">):</span>
-<span class="hll">    <span class="c1"># Create our own Table resource using the endpoint for our DynamoDB Local instance</span>
-</span><span class="hll">    <span class="n">resource</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;dynamodb&quot;</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="o">=</span><span class="s1">&#39;http://localhost:8000&#39;</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">table</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">persistence_layer</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">app</span><span class="o">.</span><span class="n">persistence_layer</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">table</span>
-</span>
+<span class="hll">    <span class="c1"># Configure the boto3 to use the endpoint for the DynamoDB Local instance</span>
+</span><span class="hll">    <span class="n">dynamodb_local_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;dynamodb&quot;</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="o">=</span><span class="s1">&#39;http://localhost:8000&#39;</span><span class="p">)</span>
+</span><span class="hll">    <span class="n">app</span><span class="o">.</span><span class="n">persistence_layer</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">dynamodb_local_client</span>
+</span><span class="hll">
+</span>    <span class="c1"># If desired, you can use a different DynamoDB Local table name than what your code already uses</span>
+    <span class="c1"># app.persistence_layer.table_name = &quot;another table name&quot;</span>
+
     <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">handler</span><span class="p">({</span><span class="s1">&#39;testkey&#39;</span><span class="p">:</span> <span class="s1">&#39;testvalue&#39;</span><span class="p">},</span> <span class="n">lambda_context</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;payment_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12345</span>
 </code></pre></div></td></tr></table></div>
@@ -3388,10 +3392,10 @@ This means it is possible to pass a mocked Table resource, or stub various metho
 
 
 <span class="k">def</span> <span class="nf">test_idempotent_lambda</span><span class="p">(</span><span class="n">lambda_context</span><span class="p">):</span>
-<span class="hll">    <span class="n">table</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">()</span>
-</span><span class="hll">    <span class="n">app</span><span class="o">.</span><span class="n">persistence_layer</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">table</span>
+<span class="hll">    <span class="n">mock_client</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">()</span>
+</span><span class="hll">    <span class="n">app</span><span class="o">.</span><span class="n">persistence_layer</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">mock_client</span>
 </span><span class="hll">    <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">handler</span><span class="p">({</span><span class="s1">&#39;testkey&#39;</span><span class="p">:</span> <span class="s1">&#39;testvalue&#39;</span><span class="p">},</span> <span class="n">lambda_context</span><span class="p">)</span>
-</span><span class="hll">    <span class="n">table</span><span class="o">.</span><span class="n">put_item</span><span class="o">.</span><span class="n">assert_called</span><span class="p">()</span>
+</span><span class="hll">    <span class="n">mock_client</span><span class="o">.</span><span class="n">put_item</span><span class="o">.</span><span class="n">assert_called</span><span class="p">()</span>
 </span>    <span class="o">...</span>
 </code></pre></div></td></tr></table></div>
 </div>
@@ -3436,7 +3440,7 @@ This means it is possible to pass a mocked Table resource, or stub various metho
   <small>
     
       Last update:
-      2023-03-31
+      2023-04-05
     
   </small>
 </div>
