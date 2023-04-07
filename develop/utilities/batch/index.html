@@ -2666,34 +2666,24 @@ This helps preserve the ordering of messages in your queue.</p>
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
+<span class="normal">29</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
 
 <span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">Tracer</span>
 <span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.batch</span> <span class="kn">import</span> <span class="n">BatchProcessor</span><span class="p">,</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">process_partial_response</span>
 <span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.parser.models</span> <span class="kn">import</span> <span class="n">SqsRecordModel</span>
 </span><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
-<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.parser</span> <span class="kn">import</span> <span class="n">validator</span><span class="p">,</span> <span class="n">BaseModel</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.parser</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.parser.types</span> <span class="kn">import</span> <span class="n">Json</span>
 
 
 <span class="k">class</span> <span class="nc">Order</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">item</span><span class="p">:</span> <span class="nb">dict</span>
 
 <span class="hll"><span class="k">class</span> <span class="nc">OrderSqsRecord</span><span class="p">(</span><span class="n">SqsRecordModel</span><span class="p">):</span>
-</span>    <span class="n">body</span><span class="p">:</span> <span class="n">Order</span>
+</span>    <span class="n">body</span><span class="p">:</span> <span class="n">Json</span><span class="p">[</span><span class="n">Order</span><span class="p">]</span>  <span class="c1"># deserialize order data from JSON string</span>
 
-    <span class="c1"># auto transform json string</span>
-    <span class="c1"># so Pydantic can auto-initialize nested Order model</span>
-    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">transform_body_to_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-<span class="hll"><span class="n">processor</span> <span class="o">=</span> <span class="n">BatchProcessor</span><span class="p">(</span><span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">SQS</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">OrderSqsRecord</span><span class="p">)</span>
-</span><span class="n">tracer</span> <span class="o">=</span> <span class="n">Tracer</span><span class="p">()</span>
+<span class="n">processor</span> <span class="o">=</span> <span class="n">BatchProcessor</span><span class="p">(</span><span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">SQS</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">OrderSqsRecord</span><span class="p">)</span>
+<span class="n">tracer</span> <span class="o">=</span> <span class="n">Tracer</span><span class="p">()</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">()</span>
 
 
@@ -2704,8 +2694,8 @@ This helps preserve the ordering of messages in your queue.</p>
 <span class="nd">@logger</span><span class="o">.</span><span class="n">inject_lambda_context</span>
 <span class="nd">@tracer</span><span class="o">.</span><span class="n">capture_lambda_handler</span>
 <span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">process_partial_response</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">record_handler</span><span class="o">=</span><span class="n">record_handler</span><span class="p">,</span> <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
+<span class="hll">    <span class="k">return</span> <span class="n">process_partial_response</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">record_handler</span><span class="o">=</span><span class="n">record_handler</span><span class="p">,</span> <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
@@ -2743,18 +2733,13 @@ This helps preserve the ordering of messages in your queue.</p>
 <span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
+<span class="normal">36</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
 
 <span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">Tracer</span>
 <span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.batch</span> <span class="kn">import</span> <span class="n">BatchProcessor</span><span class="p">,</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">process_partial_response</span>
 <span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.parser.models</span> <span class="kn">import</span> <span class="n">KinesisDataStreamRecordPayload</span><span class="p">,</span> <span class="n">KinesisDataStreamRecord</span>
 </span><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.parser</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">validator</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.parser.types</span> <span class="kn">import</span> <span class="n">Json</span>
 <span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
 
 
@@ -2763,14 +2748,7 @@ This helps preserve the ordering of messages in your queue.</p>
 
 
 <span class="hll"><span class="k">class</span> <span class="nc">OrderKinesisPayloadRecord</span><span class="p">(</span><span class="n">KinesisDataStreamRecordPayload</span><span class="p">):</span>
-</span>    <span class="n">data</span><span class="p">:</span> <span class="n">Order</span>
-
-    <span class="c1"># auto transform json string</span>
-    <span class="c1"># so Pydantic can auto-initialize nested Order model</span>
-    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">transform_message_to_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="c1"># Powertools KinesisDataStreamRecord already decodes b64 to str here</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span>    <span class="n">data</span><span class="p">:</span> <span class="n">Json</span><span class="p">[</span><span class="n">Order</span><span class="p">]</span>
 
 
 <span class="hll"><span class="k">class</span> <span class="nc">OrderKinesisRecord</span><span class="p">(</span><span class="n">KinesisDataStreamRecord</span><span class="p">):</span>
@@ -2790,8 +2768,8 @@ This helps preserve the ordering of messages in your queue.</p>
 <span class="nd">@logger</span><span class="o">.</span><span class="n">inject_lambda_context</span>
 <span class="nd">@tracer</span><span class="o">.</span><span class="n">capture_lambda_handler</span>
 <span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">process_partial_response</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">record_handler</span><span class="o">=</span><span class="n">record_handler</span><span class="p">,</span> <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
+<span class="hll">    <span class="k">return</span> <span class="n">process_partial_response</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">record_handler</span><span class="o">=</span><span class="n">record_handler</span><span class="p">,</span> <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
