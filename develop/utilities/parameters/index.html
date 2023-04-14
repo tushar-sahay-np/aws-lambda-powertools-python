@@ -1595,7 +1595,7 @@
 <summary>Tip</summary>
 <p><code>max_age</code> parameter is also available in underlying provider functions like <code>get()</code>, <code>get_multiple()</code>, etc.</p>
 </details>
-<p>By default, we cache parameters retrieved in-memory for 5 seconds.</p>
+<p>By default, we cache parameters retrieved in-memory for 5 seconds. If you want to change this default value and set the same TTL for all parameters, you can set the <code>POWERTOOLS_PARAMETERS_MAX_AGE</code> environment variable. <strong>You can still set <code>max_age</code> for individual parameters</strong>.</p>
 <p>You can adjust how long we should keep values in cache by using the param <code>max_age</code>, when using  <code>get_parameter()</code>, <code>get_parameters()</code> and <code>get_secret()</code> methods across all providers.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="6:4"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><input id="__tabbed_6_4" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">single_ssm_parameter_with_cache.py</label><label for="__tabbed_6_2">recursive_ssm_parameter_with_cache.py</label><label for="__tabbed_6_3">secret_with_cache.py</label><label for="__tabbed_6_4">appconfig_with_cache.py</label></div>
 <div class="tabbed-content">
@@ -2151,6 +2151,10 @@
 </tbody>
 </table>
 <p>You can create <code>SecureString</code> parameters, which are parameters that have a plaintext parameter name and an encrypted parameter value. If you don't use the <code>decrypt</code> argument, you will get an encrypted value. Read <a href="https://docs.aws.amazon.com/kms/latest/developerguide/services-parameter-store.html">here</a> about best practices using KMS to secure your parameters.</p>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>If you want to always decrypt parameters, you can set the <code>POWERTOOLS_PARAMETERS_SSM_DECRYPT=true</code> environment variable. <strong>This will override the default value of <code>false</code> but you can still set the <code>decrypt</code> option for individual parameters</strong>.</p>
+</details>
 <div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">builtin_provider_ssm_with_decrypt.py</label><label for="__tabbed_9_2">builtin_provider_ssm_with_no_recursive.py</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -3909,7 +3913,7 @@ object named <code>get_parameter_mock</code>.</p>
   <small>
     
       Last update:
-      2023-02-28
+      2023-04-14
     
   </small>
 </div>
