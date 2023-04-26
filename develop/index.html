@@ -2272,7 +2272,7 @@ General<span class="w"> </span>information
 </code></pre></div></td></tr></table></div>
 </details>
 <h2 id="quick-getting-started">Quick getting started<a class="headerlink" href="#quick-getting-started" title="Permanent link">&para;</a></h2>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Hello world example using SAM CLI</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>sam<span class="w"> </span>init<span class="w"> </span>--location<span class="w"> </span>https://github.com/aws-samples/cookiecutter-aws-sam-python
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Hello world example using SAM CLI</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>sam<span class="w"> </span>init<span class="w"> </span>--app-template<span class="w"> </span>hello-world-powertools-python<span class="w"> </span>--name<span class="w"> </span>sam-app<span class="w"> </span>--package-type<span class="w"> </span>Zip<span class="w"> </span>--runtime<span class="w"> </span>python3.10<span class="w"> </span>--no-tracing
 </code></pre></div></td></tr></table></div>
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <p>Core utilities such as Tracing, Logging, Metrics, and Event Handler will be available across all Powertools languages. Additional utilities are subjective to each language ecosystem and customer demand.</p>
@@ -2507,7 +2507,7 @@ General<span class="w"> </span>information
   <small>
     
       Last update:
-      2023-04-25
+      2023-04-26
     
   </small>
 </div>
