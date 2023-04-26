@@ -1213,9 +1213,11 @@
 <p>Let's clone our sample project before we add one feature at a time.</p>
 <details class="tip" open="open">
 <summary>Tip: Want to skip to the final project?</summary>
-<p>Bootstrap directly via SAM CLI: <code>sam init --location https://github.com/aws-samples/cookiecutter-aws-sam-python</code></p>
+<p>Bootstrap directly via SAM CLI:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>sam<span class="w"> </span>init<span class="w"> </span>--app-template<span class="w"> </span>hello-world-powertools-python<span class="w"> </span>--name<span class="w"> </span>sam-app<span class="w"> </span>--package-type<span class="w"> </span>Zip<span class="w"> </span>--runtime<span class="w"> </span>python3.10<span class="w"> </span>--no-tracing<span class="sb">`</span>
+</code></pre></div></td></tr></table></div>
 </details>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Use SAM CLI to initialize the sample project</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>sam<span class="w"> </span>init<span class="w"> </span>--runtime<span class="w"> </span>python3.9<span class="w"> </span>--dependency-manager<span class="w"> </span>pip<span class="w"> </span>--app-template<span class="w"> </span>hello-world<span class="w"> </span>--name<span class="w"> </span>powertools-quickstart
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Use SAM CLI to initialize the sample project</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>sam<span class="w"> </span>init<span class="w"> </span>--runtime<span class="w"> </span>python3.10<span class="w"> </span>--dependency-manager<span class="w"> </span>pip<span class="w"> </span>--app-template<span class="w"> </span>hello-world<span class="w"> </span>--name<span class="w"> </span>powertools-quickstart
 </code></pre></div></td></tr></table></div>
 <h3 id="project-structure">Project structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h3>
 <p>As we move forward, we will modify the following files within the <code>powertools-quickstart</code> folder:</p>
