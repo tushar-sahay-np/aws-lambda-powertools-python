@@ -1103,18 +1103,30 @@
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.jmespath_utils</span> <span class="kn">import</span> <span class="p">(</span>
-</span><span class="hll">    <span class="n">envelopes</span><span class="p">,</span>
-</span><span class="hll">    <span class="n">extract_data_from_envelope</span><span class="p">,</span>
-</span><span class="hll"><span class="p">)</span>
-</span><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="hll"><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+</span><span class="hll">
+</span><span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span>
+</span><span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.jmespath_utils</span> <span class="kn">import</span> <span class="p">(</span>
+</span>    <span class="n">envelopes</span><span class="p">,</span>
+    <span class="n">extract_data_from_envelope</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">aws_lambda_powertools.utilities.typing</span> <span class="kn">import</span> <span class="n">LambdaContext</span>
+<span class="hll">
+</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LambdaContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="hll">    <span class="n">payload</span> <span class="o">=</span> <span class="n">extract_data_from_envelope</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">envelope</span><span class="o">=</span><span class="n">envelopes</span><span class="o">.</span><span class="n">SQS</span><span class="p">)</span>
-</span>    <span class="n">customer_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;customerId&quot;</span><span class="p">)</span>  <span class="c1"># now deserialized</span>
+    <span class="n">records</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">extract_data_from_envelope</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">envelope</span><span class="o">=</span><span class="n">envelopes</span><span class="o">.</span><span class="n">SQS</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>  <span class="c1"># records is a list</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;customerId&quot;</span><span class="p">))</span>  <span class="c1"># now deserialized</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;customer_id&quot;</span><span class="p">:</span> <span class="n">customer_id</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
@@ -1171,39 +1183,63 @@
 </thead>
 <tbody>
 <tr>
+<td><strong><code>API_GATEWAY_HTTP</code></strong></td>
+<td><code>powertools_json(body)</code></td>
+</tr>
+<tr>
 <td><strong><code>API_GATEWAY_REST</code></strong></td>
 <td><code>powertools_json(body)</code></td>
 </tr>
 <tr>
-<td><strong><code>API_GATEWAY_HTTP</code></strong></td>
-<td><code>API_GATEWAY_REST</code></td>
+<td><strong><code>CLOUDWATCH_EVENTS_SCHEDULED</code></strong></td>
+<td><code>detail</code></td>
 </tr>
 <tr>
-<td><strong><code>SQS</code></strong></td>
-<td><code>Records[*].powertools_json(body)</code></td>
-</tr>
-<tr>
-<td><strong><code>SNS</code></strong></td>
-<td><code>Records[0].Sns.Message                                       | powertools_json(@)</code></td>
+<td><strong><code>CLOUDWATCH_LOGS</code></strong></td>
+<td><code>awslogs.powertools_base64_gzip(data) | powertools_json(@).logEvents[*]</code></td>
 </tr>
 <tr>
 <td><strong><code>EVENTBRIDGE</code></strong></td>
 <td><code>detail</code></td>
 </tr>
 <tr>
-<td><strong><code>CLOUDWATCH_EVENTS_SCHEDULED</code></strong></td>
-<td><code>EVENTBRIDGE</code></td>
-</tr>
-<tr>
 <td><strong><code>KINESIS_DATA_STREAM</code></strong></td>
 <td><code>Records[*].kinesis.powertools_json(powertools_base64(data))</code></td>
 </tr>
 <tr>
-<td><strong><code>CLOUDWATCH_LOGS</code></strong></td>
-<td><code>awslogs.powertools_base64_gzip(data)                         | powertools_json(@).logEvents[*]</code></td>
+<td><strong><code>S3_EVENTBRIDGE_SQS</code></strong></td>
+<td><code>Records[*].powertools_json(body).detail</code></td>
+</tr>
+<tr>
+<td><strong><code>S3_KINESIS_FIREHOSE</code></strong></td>
+<td><code>records[*].powertools_json(powertools_base64(data)).Records[0]</code></td>
+</tr>
+<tr>
+<td><strong><code>S3_SNS_KINESIS_FIREHOSE</code></strong></td>
+<td><code>records[*].powertools_json(powertools_base64(data)).powertools_json(Message).Records[0]</code></td>
+</tr>
+<tr>
+<td><strong><code>S3_SNS_SQS</code></strong></td>
+<td><code>Records[*].powertools_json(body).powertools_json(Message).Records[0]</code></td>
+</tr>
+<tr>
+<td><strong><code>S3_SQS</code></strong></td>
+<td><code>Records[*].powertools_json(body).Records[0]</code></td>
+</tr>
+<tr>
+<td><strong><code>SNS</code></strong></td>
+<td><code>Records[0].Sns.Message | powertools_json(@)</code></td>
+</tr>
+<tr>
+<td><strong><code>SQS</code></strong></td>
+<td><code>Records[*].powertools_json(body)</code></td>
 </tr>
 </tbody>
 </table>
+<details class="tip" open="open">
+<summary>Using SNS?</summary>
+<p>If you don't require SNS metadata, enable <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-large-payload-raw-message-delivery.html">raw message delivery</a>{target="<em>blank"}. It will reduce multiple payload layers and size, when using SNS in combination with other services </em>(e.g., SQS, S3, etc)_.</p>
+</details>
 <h2 id="advanced">Advanced<a class="headerlink" href="#advanced" title="Permanent link">&para;</a></h2>
 <h3 id="built-in-jmespath-functions">Built-in JMESPath functions<a class="headerlink" href="#built-in-jmespath-functions" title="Permanent link">&para;</a></h3>
 <p>You can use our built-in JMESPath functions within your envelope expression. They handle deserialization for common data formats found in AWS Lambda event sources such as JSON strings, base64, and uncompress gzip data.</p>
@@ -2162,7 +2198,7 @@
   <small>
     
       Last update:
-      2022-10-05
+      2023-05-01
     
   </small>
 </div>

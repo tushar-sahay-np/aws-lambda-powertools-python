@@ -1801,42 +1801,42 @@
 <table>
 <thead>
 <tr>
-<th>Envelope name</th>
+<th>Envelope</th>
 <th>JMESPath expression</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>API_GATEWAY_REST</strong></td>
-<td>"powertools_json(body)"</td>
+<td><strong><code>API_GATEWAY_HTTP</code></strong></td>
+<td><code>powertools_json(body)</code></td>
 </tr>
 <tr>
-<td><strong>API_GATEWAY_HTTP</strong></td>
-<td>"powertools_json(body)"</td>
+<td><strong><code>API_GATEWAY_REST</code></strong></td>
+<td><code>powertools_json(body)</code></td>
 </tr>
 <tr>
-<td><strong>SQS</strong></td>
-<td>"Records[*].powertools_json(body)"</td>
+<td><strong><code>CLOUDWATCH_EVENTS_SCHEDULED</code></strong></td>
+<td><code>detail</code></td>
 </tr>
 <tr>
-<td><strong>SNS</strong></td>
-<td>"Records[0].Sns.Message</td>
+<td><strong><code>CLOUDWATCH_LOGS</code></strong></td>
+<td><code>awslogs.powertools_base64_gzip(data) | powertools_json(@).logEvents[*]</code></td>
 </tr>
 <tr>
-<td><strong>EVENTBRIDGE</strong></td>
-<td>"detail"</td>
+<td><strong><code>EVENTBRIDGE</code></strong></td>
+<td><code>detail</code></td>
 </tr>
 <tr>
-<td><strong>CLOUDWATCH_EVENTS_SCHEDULED</strong></td>
-<td>"detail"</td>
+<td><strong><code>KINESIS_DATA_STREAM</code></strong></td>
+<td><code>Records[*].kinesis.powertools_json(powertools_base64(data))</code></td>
 </tr>
 <tr>
-<td><strong>KINESIS_DATA_STREAM</strong></td>
-<td>"Records[*].kinesis.powertools_json(powertools_base64(data))"</td>
+<td><strong><code>SNS</code></strong></td>
+<td><code>Records[0].Sns.Message | powertools_json(@)</code></td>
 </tr>
 <tr>
-<td><strong>CLOUDWATCH_LOGS</strong></td>
-<td>"awslogs.powertools_base64_gzip(data)</td>
+<td><strong><code>SQS</code></strong></td>
+<td><code>Records[*].powertools_json(body)</code></td>
 </tr>
 </tbody>
 </table>
@@ -2011,7 +2011,7 @@
   <small>
     
       Last update:
-      2022-12-13
+      2023-05-01
     
   </small>
 </div>
