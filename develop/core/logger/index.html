@@ -637,6 +637,26 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#observability-providers" class="md-nav__link">
+    Observability providers
+  </a>
+  
+    <nav class="md-nav" aria-label="Observability providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#built-in-formatters" class="md-nav__link">
+    Built-in formatters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#migrating-from-other-loggers" class="md-nav__link">
     Migrating from other Loggers
   </a>
@@ -1330,6 +1350,26 @@
   <a href="#lambdapowertoolsformatter" class="md-nav__link">
     LambdaPowertoolsFormatter
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observability-providers" class="md-nav__link">
+    Observability providers
+  </a>
+  
+    <nav class="md-nav" aria-label="Observability providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#built-in-formatters" class="md-nav__link">
+    Built-in formatters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -2886,6 +2926,40 @@
 <span class="hll"><span class="n">formatter</span> <span class="o">=</span> <span class="n">LambdaPowertoolsFormatter</span><span class="p">(</span><span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_record_order</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
 </span><span class="hll"><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">,</span> <span class="n">logger_formatter</span><span class="o">=</span><span class="n">formatter</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
+<h3 id="observability-providers">Observability providers<a class="headerlink" href="#observability-providers" title="Permanent link">&para;</a></h3>
+<div class="admonition note">
+<p class="admonition-title">In this context, an observability provider is an <a href="https://go.aws/3HtU6CZ" target="_blank">AWS Lambda Partner</a> offering a platform for logging, metrics, traces, etc.</p>
+</div>
+<p>You can send logs to the observability provider of your choice via <a href="https://aws.amazon.com/blogs/compute/using-aws-lambda-extensions-to-send-logs-to-custom-destinations/" target="_blank">Lambda Extensions</a>. In most cases, you shouldn't need any custom Logger configuration, and logs will be shipped async without any performance impact.</p>
+<h4 id="built-in-formatters">Built-in formatters<a class="headerlink" href="#built-in-formatters" title="Permanent link">&para;</a></h4>
+<p>In rare circumstances where JSON logs are not parsed correctly by your provider, we offer built-in formatters to make this transition easier.</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Formatter</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Datadog</td>
+<td><code>DatadogLogFormatter</code></td>
+<td>Modifies default timestamp to use RFC3339 by default</td>
+</tr>
+</tbody>
+</table>
+<p>You can use import and use them as any other Logger formatter via <code>logger_formatter</code> parameter:</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Using built-in Logger Formatters</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">aws_lambda_powertools</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="hll"><span class="kn">from</span> <span class="nn">aws_lambda_powertools.logging.formatters.datadog</span> <span class="kn">import</span> <span class="n">DatadogLogFormatter</span>
+</span>
+<span class="hll"><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;payment&quot;</span><span class="p">,</span> <span class="n">logger_formatter</span><span class="o">=</span><span class="n">DatadogLogFormatter</span><span class="p">())</span>
+</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
 <h3 id="migrating-from-other-loggers">Migrating from other Loggers<a class="headerlink" href="#migrating-from-other-loggers" title="Permanent link">&para;</a></h3>
 <p>If you're migrating from other Loggers, there are few key points to be aware of: <a href="#the-service-parameter">Service parameter</a>, <a href="#inheriting-loggers">Inheriting Loggers</a>, <a href="#overriding-log-records">Overriding Log records</a>, and <a href="#logging-exceptions">Logging exceptions</a>.</p>
 <h4 id="the-service-parameter">The service parameter<a class="headerlink" href="#the-service-parameter" title="Permanent link">&para;</a></h4>
@@ -3859,7 +3933,7 @@ for the given name and level to the logging module. By default, this logs all bo
   <small>
     
       Last update:
-      2023-03-24
+      2023-05-01
     
   </small>
 </div>
