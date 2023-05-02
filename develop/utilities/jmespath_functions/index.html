@@ -1196,7 +1196,7 @@
 </tr>
 <tr>
 <td><strong><code>CLOUDWATCH_LOGS</code></strong></td>
-<td><code>awslogs.powertools_base64_gzip(data) | powertools_json(@).logEvents[*]</code></td>
+<td><code>awslogs.powertools_base64_gzip(data)                                                     | powertools_json(@).logEvents[*]</code></td>
 </tr>
 <tr>
 <td><strong><code>EVENTBRIDGE</code></strong></td>
@@ -1228,7 +1228,7 @@
 </tr>
 <tr>
 <td><strong><code>SNS</code></strong></td>
-<td><code>Records[0].Sns.Message | powertools_json(@)</code></td>
+<td><code>Records[0].Sns.Message                                                                   | powertools_json(@)</code></td>
 </tr>
 <tr>
 <td><strong><code>SQS</code></strong></td>
@@ -1238,7 +1238,7 @@
 </table>
 <details class="tip" open="open">
 <summary>Using SNS?</summary>
-<p>If you don't require SNS metadata, enable <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-large-payload-raw-message-delivery.html">raw message delivery</a>{target="<em>blank"}. It will reduce multiple payload layers and size, when using SNS in combination with other services </em>(e.g., SQS, S3, etc)_.</p>
+<p>If you don't require SNS metadata, enable <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-large-payload-raw-message-delivery.html">raw message delivery</a>{target="<em>blank"}. It will reduce multiple payload layers and size, when using SNS in combination with other services (_e.g., SQS, S3, etc</em>).</p>
 </details>
 <h2 id="advanced">Advanced<a class="headerlink" href="#advanced" title="Permanent link">&para;</a></h2>
 <h3 id="built-in-jmespath-functions">Built-in JMESPath functions<a class="headerlink" href="#built-in-jmespath-functions" title="Permanent link">&para;</a></h3>
@@ -2198,7 +2198,7 @@
   <small>
     
       Last update:
-      2023-05-01
+      2023-05-02
     
   </small>
 </div>
