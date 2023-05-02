@@ -2261,7 +2261,7 @@ This helps preserve the ordering of messages in your queue.</p>
 </div>
 </div>
 <h3 id="processing-messages-from-dynamodb">Processing messages from DynamoDB<a class="headerlink" href="#processing-messages-from-dynamodb" title="Permanent link">&para;</a></h3>
-<p>Processing batches from Kinesis works in three stages:</p>
+<p>Processing batches from DynamoDB Streams works in three stages:</p>
 <ol>
 <li>Instantiate <strong><code>BatchProcessor</code></strong> and choose <strong><code>EventType.DynamoDBStreams</code></strong> for the event type</li>
 <li>Define your function to handle each batch record, and use <a href="../data_classes/#dynamodb-streams" target="_blank"><code>DynamoDBRecord</code></a> type annotation for autocompletion</li>
@@ -3654,7 +3654,7 @@ This helps preserve the ordering of messages in your queue.</p>
   <small>
     
       Last update:
-      2023-04-07
+      2023-05-02
     
   </small>
 </div>
