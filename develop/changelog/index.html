@@ -7043,10 +7043,12 @@
 <h2 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">&para;</a></h2>
 <ul>
 <li>typo</li>
+<li><strong>ci:</strong> pypi publishing was targetting test endpoint</li>
 </ul>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>batch:</strong> fixed typo in DynamoDB Streams section (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2189">#2189</a>)</li>
+<li><strong>examples:</strong> standardize lambda handler function name (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2192">#2192</a>)</li>
 <li><strong>homepage:</strong> add customer references section (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2159">#2159</a>)</li>
 <li><strong>jmespath:</strong> fix MD037/no-space-in-emphasis</li>
 <li><strong>tutorial:</strong> use newer sam cli template; update to py3.10 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2167">#2167</a>)</li>
@@ -7055,6 +7057,7 @@
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>ci:</strong> dispatch GitHub analytics action (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2161">#2161</a>)</li>
+<li><strong>event_source:</strong> support custom json_deserializer; add json_body in SQSEvent (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2200">#2200</a>)</li>
 <li><strong>event_source:</strong> add support for dynamic partitions in the Api Gateway Authorizer event (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2176">#2176</a>)</li>
 <li><strong>event_sources:</strong> Add <strong>str</strong> to Data Classes base DictWrapper (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2129">#2129</a>)</li>
 <li><strong>jmespath:</strong> new built-in envelopes to unwrap S3 events (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2169">#2169</a>)</li>
@@ -7065,16 +7068,20 @@
 <h2 id="maintenance">Maintenance<a class="headerlink" href="#maintenance" title="Permanent link">&para;</a></h2>
 <ul>
 <li>add dummy reusable dispatch analytics job</li>
+<li><strong>ci:</strong> use new pypi trusted publisher for increase security (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2198">#2198</a>)</li>
+<li><strong>deps:</strong> bump pypa/gh-action-pypi-publish from 1.8.5 to 1.8.6 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2201">#2201</a>)</li>
+<li><strong>deps-dev:</strong> bump mkdocs-material from 9.1.8 to 9.1.9 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2190">#2190</a>)</li>
 <li><strong>deps-dev:</strong> bump types-requests from 2.28.11.17 to 2.29.0.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2187">#2187</a>)</li>
 <li><strong>deps-dev:</strong> bump coverage from 7.2.4 to 7.2.5 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2186">#2186</a>)</li>
 <li><strong>deps-dev:</strong> bump coverage from 7.2.3 to 7.2.4 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2179">#2179</a>)</li>
-<li><strong>deps-dev:</strong> bump cfn-lint from 0.77.3 to 0.77.4 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2178">#2178</a>)</li>
+<li><strong>deps-dev:</strong> bump importlib-metadata from 6.5.0 to 6.6.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2163">#2163</a>)</li>
+<li><strong>deps-dev:</strong> bump mypy-boto3-xray from 1.26.11.post1 to 1.26.122 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2173">#2173</a>)</li>
 <li><strong>deps-dev:</strong> bump aws-cdk from 2.76.0 to 2.77.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2174">#2174</a>)</li>
 <li><strong>deps-dev:</strong> bump mypy-boto3-lambda from 1.26.115 to 1.26.122 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2172">#2172</a>)</li>
 <li><strong>deps-dev:</strong> bump cfn-lint from 0.77.2 to 0.77.3 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2165">#2165</a>)</li>
 <li><strong>deps-dev:</strong> bump mkdocs-material from 9.1.6 to 9.1.8 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2162">#2162</a>)</li>
-<li><strong>deps-dev:</strong> bump importlib-metadata from 6.5.0 to 6.6.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2163">#2163</a>)</li>
-<li><strong>deps-dev:</strong> bump mypy-boto3-xray from 1.26.11.post1 to 1.26.122 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2173">#2173</a>)</li>
+<li><strong>deps-dev:</strong> bump cfn-lint from 0.77.3 to 0.77.4 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2178">#2178</a>)</li>
+<li><strong>governance:</strong> add Lambda Powertools for .NET in issue templates (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2196">#2196</a>)</li>
 </ul>
 <p><a name="v2.14.1"></a></p>
 <h2 id="v2141-2023-04-21"><a href="https://github.com/awslabs/aws-lambda-powertools-python/compare/v2.14.0...v2.14.1">v2.14.1</a> - 2023-04-21<a class="headerlink" href="#v2141-2023-04-21" title="Permanent link">&para;</a></h2>
