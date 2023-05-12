@@ -7093,18 +7093,14 @@
 <li><strong>ci:</strong> update layer ARN docs and create PR during release (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2240">#2240</a>)</li>
 <li><strong>ci:</strong> bump package version after release via pull request (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2239">#2239</a>)</li>
 <li><strong>ci:</strong> convert create-pr steps into composite action (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2238">#2238</a>)</li>
-<li><strong>ci:</strong> changelog rebuild (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2241">#2241</a>)</li>
 <li><strong>ci:</strong> enforce zero trust for third party workflows (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2215">#2215</a>)</li>
 <li><strong>ci:</strong> remove auto-merge workflow (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2214">#2214</a>)</li>
-<li><strong>ci:</strong> changelog rebuild (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2236">#2236</a>)</li>
 <li><strong>ci:</strong> schedule changelog to rebuild daily at 8am, and on release only (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2216">#2216</a>)</li>
-<li><strong>ci:</strong> changelog rebuild (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2232">#2232</a>)</li>
-<li><strong>ci:</strong> changelog rebuild (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2230">#2230</a>)</li>
-<li><strong>ci:</strong> changelog rebuild (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2245">#2245</a>)</li>
 <li><strong>ci:</strong> create pull request on changelog update (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2224">#2224</a>)</li>
+<li><strong>ci:</strong> filter out bot commits from CHANGELOG</li>
 <li><strong>deps:</strong> bump zgosalvez/github-actions-ensure-sha-pinned-actions from 2.1.2 to 2.1.3 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2227">#2227</a>)</li>
-<li><strong>deps-dev:</strong> bump mkdocs-material from 9.1.9 to 9.1.11 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2229">#2229</a>)</li>
 <li><strong>deps-dev:</strong> bump cfn-lint from 0.77.4 to 0.77.5 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2228">#2228</a>)</li>
+<li><strong>deps-dev:</strong> bump mkdocs-material from 9.1.9 to 9.1.11 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2229">#2229</a>)</li>
 <li><strong>deps-dev:</strong> bump mypy-boto3-cloudwatch from 1.26.99 to 1.26.127 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2219">#2219</a>)</li>
 <li><strong>deps-dev:</strong> bump types-requests from 2.29.0.0 to 2.30.0.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2220">#2220</a>)</li>
 <li><strong>deps-dev:</strong> bump mypy-boto3-s3 from 1.26.116 to 1.26.127 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/2218">#2218</a>)</li>
@@ -9222,7 +9218,6 @@
 <li>fix dependabot commit messages prefix</li>
 <li>fix dependabot unique set config</li>
 <li>bump mkdocs-material from 7.1.5 to 7.1.6 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/451">#451</a>)</li>
-<li>bump version to 1.17.0</li>
 <li>bump boto3 from 1.17.78 to 1.17.84 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/449">#449</a>)</li>
 <li>update mergify to require approval on dependabot (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/456">#456</a>)</li>
 <li>bump actions/setup-python from 1 to 2.2.2 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/445">#445</a>)</li>
@@ -9604,9 +9599,6 @@
 <li>Add Ses lambda event support to Parser utility <a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/213">#213</a></li>
 </ul>
 <h2 id="maintenance_77">Maintenance<a class="headerlink" href="#maintenance_77" title="Permanent link">&para;</a></h2>
-<ul>
-<li>bump version to 1.9.0</li>
-</ul>
 <h2 id="pull-requests_5">Pull Requests<a class="headerlink" href="#pull-requests_5" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Merge pull request <a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/227">#227</a> from risenberg-cyberark/kinesis</li>
@@ -9715,7 +9707,6 @@
 <h2 id="maintenance_79">Maintenance<a class="headerlink" href="#maintenance_79" title="Permanent link">&para;</a></h2>
 <ul>
 <li>fix repository URL</li>
-<li>bump version to 1.7.0</li>
 <li>spacing</li>
 <li>typo in list</li>
 <li>typo on code generation tool</li>
@@ -9882,7 +9873,6 @@
 </ul>
 <h2 id="maintenance_82">Maintenance<a class="headerlink" href="#maintenance_82" title="Permanent link">&para;</a></h2>
 <ul>
-<li>bump version to 1.5.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/158">#158</a>)</li>
 <li>tiny changes for readability</li>
 <li>add debug logging for sqs batch processing</li>
 <li>remove middlewares module, moving decorator functionality to base and sqs</li>
@@ -9975,9 +9965,6 @@
 <li>add parameter utility (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/96">#96</a>)</li>
 </ul>
 <h2 id="maintenance_85">Maintenance<a class="headerlink" href="#maintenance_85" title="Permanent link">&para;</a></h2>
-<ul>
-<li>bump version to 1.3.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/122">#122</a>)</li>
-</ul>
 <p><a name="v1.2.0"></a></p>
 <h2 id="v120-2020-08-20"><a href="https://github.com/awslabs/aws-lambda-powertools-python/compare/v1.1.3...v1.2.0">v1.2.0</a> - 2020-08-20<a class="headerlink" href="#v120-2020-08-20" title="Permanent link">&para;</a></h2>
 <h2 id="features_52">Features<a class="headerlink" href="#features_52" title="Permanent link">&para;</a></h2>
@@ -9985,9 +9972,6 @@
 <li>add support for tracing of generators using capture_method decorator (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/113">#113</a>)</li>
 </ul>
 <h2 id="maintenance_86">Maintenance<a class="headerlink" href="#maintenance_86" title="Permanent link">&para;</a></h2>
-<ul>
-<li>bump version to 1.2.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/119">#119</a>)</li>
-</ul>
 <p><a name="v1.1.3"></a></p>
 <h2 id="v113-2020-08-18"><a href="https://github.com/awslabs/aws-lambda-powertools-python/compare/v1.1.2...v1.1.3">v1.1.3</a> - 2020-08-18<a class="headerlink" href="#v113-2020-08-18" title="Permanent link">&para;</a></h2>
 <h2 id="bug-fixes_75">Bug Fixes<a class="headerlink" href="#bug-fixes_75" title="Permanent link">&para;</a></h2>
@@ -10015,7 +9999,6 @@
 </ul>
 <h2 id="maintenance_88">Maintenance<a class="headerlink" href="#maintenance_88" title="Permanent link">&para;</a></h2>
 <ul>
-<li>bump version to 1.1.2</li>
 <li>suppress LGTM alert</li>
 <li>add autocomplete as unreleased</li>
 <li>remove unused stdout fixture</li>
@@ -10114,7 +10097,6 @@
 <h2 id="maintenance_93">Maintenance<a class="headerlink" href="#maintenance_93" title="Permanent link">&para;</a></h2>
 <ul>
 <li>update CHANGELOG</li>
-<li>bump version to 0.11.0 (<a href="https://github.com/awslabs/aws-lambda-powertools-python/issues/76">#76</a>)</li>
 </ul>
 <p><a name="v0.10.1"></a></p>
 <h2 id="v0101-2020-06-10"><a href="https://github.com/awslabs/aws-lambda-powertools-python/compare/v0.10.0...v0.10.1">v0.10.1</a> - 2020-06-10<a class="headerlink" href="#v0101-2020-06-10" title="Permanent link">&para;</a></h2>
